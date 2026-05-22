@@ -1,0 +1,44 @@
+{
+  "name": "ai-engineer-portfolio",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Personal portfolio for a junior AI/Data Engineer — Astro + MDX + R3F",
+  "type": "module",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "check": "astro check",
+    "lint": "biome check .",
+    "lint:fix": "biome check --apply .",
+    "format": "biome format --write .",
+    "a11y": "axe ./dist --exit",
+    "lh": "lhci autorun --config=./lighthouserc.json",
+    "new-project": "node ./scripts/new-project.mjs"
+  },
+  "dependencies": {
+    "astro": "^5.0.0",
+    "@astrojs/mdx": "^4.0.0",
+    "@astrojs/react": "^4.0.0",
+    "@astrojs/sitemap": "^3.2.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "@react-three/fiber": "^9.0.0",
+    "@react-three/drei": "^10.0.0",
+    "three": "^0.170.0",
+    "zod": "^3.23.0"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^1.9.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "@types/three": "^0.170.0",
+    "@axe-core/cli": "^4.10.0",
+    "@lhci/cli": "^0.14.0",
+    "typescript": "^5.6.0"
+  },
+  "packageManager": "pnpm@9.0.0",
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}

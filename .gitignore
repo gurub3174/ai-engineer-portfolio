@@ -1,0 +1,42 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Build output
+dist/
+.astro/
+.cache/
+
+# Local files
+CLAUDE.local.md
+.env
+.env.local
+.env.*.local
+
+# Claude Code local tooling (NOT committed — this is a website, not an agentic-tool project)
+.claude/settings.local.json
+.claude/skills/
+.claude/agents/
+.claude/commands/
+.claude/hooks/
+# .claude/rules/ IS committed — modular conventions belong in the repo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# Logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# Lighthouse CI
+.lighthouseci/
+
+# Asset working files (raw renders, source PSDs)
+/src/assets/_raw/
