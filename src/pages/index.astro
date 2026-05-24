@@ -1,0 +1,98 @@
+---
+// Phase 0 placeholder home page.
+// Real StudioTable home is built in Phase 2 per spec/implementation-plan.md.
+// This file exists to satisfy the Phase 0 exit criterion: "placeholder home deploys green on Cloudflare."
+// Real OKLCH tokens land in src/styles/tokens.css during Phase 1.
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="Portfolio site in build phase. Phase 0 placeholder; full site lands at launch." />
+    <title>Portfolio — in build</title>
+    <style>
+      :root {
+        --bg-stage: oklch(0.14 0.008 65);
+        --ink: oklch(0.92 0.012 65);
+        --ink-muted: oklch(0.62 0.010 65);
+        --key-light: oklch(0.74 0.160 65);
+      }
+
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        background: var(--bg-stage);
+        color: var(--ink);
+      }
+
+      body {
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        padding: 2rem 1.5rem;
+        font-family: serif;
+        line-height: 1.6;
+      }
+
+      main {
+        max-width: 38rem;
+      }
+
+      h1 {
+        font-size: clamp(1.6rem, 4.5vw, 2.6rem);
+        font-weight: 400;
+        margin: 0 0 1.5rem 0;
+        letter-spacing: -0.01em;
+      }
+
+      h1 span {
+        color: var(--key-light);
+      }
+
+      p {
+        color: var(--ink-muted);
+        margin: 0 0 0.85rem 0;
+        max-width: 65ch;
+      }
+
+      code {
+        font-family: monospace;
+        color: var(--key-light);
+        font-size: 0.92em;
+      }
+
+      .meta {
+        margin-top: 2rem;
+        font-size: 0.85rem;
+        color: var(--ink-muted);
+        opacity: 0.7;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Portfolio <span>in build</span></h1>
+      <p>Phase 0 placeholder. The real home page lands in Phase 2.</p>
+      <p>Current state: Astro 5 scaffold up, CI gates wired (desktop + mobile Lighthouse), design system locked, OKLCH tokens deferred to Phase 1.</p>
+      <p>
+        Routes coming online during the build:
+        <code>/projects/podcast</code>,
+        <code>/projects/doc-extractor</code>,
+        <code>/projects/ai-design-team</code>,
+        <code>/about</code>,
+        <code>/contact</code>,
+        <code>/now</code>.
+      </p>
+      <p class="meta">Build started 2026-05-22. Launch target 2026-06-21.</p>
+    </main>
+  </body>
+</html>
