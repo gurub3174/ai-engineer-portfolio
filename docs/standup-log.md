@@ -75,6 +75,33 @@ Phase 0 scaffold (`043b1ce`) ran *before* Phase -1 inventory check. This deviate
 - Open new session OR continue this one and invoke `/impeccable shape` against the locked design-decisions.md sections 1-5
 - Phase 1 outputs flow into `docs/design-decisions.md` §6-10 plus `src/styles/tokens.css`
 
+---
+
+## Day 0 — 2026-05-23 (Phase 0 EXIT)
+
+**Phase 0 exit criteria — all met:**
+
+- ✅ `pnpm dev` works locally (placeholder home renders at http://localhost:4321)
+- ✅ `pnpm check` + `pnpm build` pass clean (Astro 5.18, dist/index.html built in 3.7s)
+- ✅ Push to `main` triggers CI green
+- ✅ Cloudflare deploys to `*.pages.dev` URL
+- ✅ Skills installed at `.claude/skills/` (frontend-design, impeccable)
+- ✅ All design rules amended per skill cross-check (OKLCH, Committed strategy, key+warm-rim, impeccable copy laws + 6 absolute bans)
+- ✅ PRODUCT.md, DESIGN.md seeded for impeccable loader
+- ✅ docs/design-decisions.md §1-5 locked (register, theme + physical-scene sentence, color strategy, lighting, typography direction)
+
+**Cloudflare deployment hiccup resolved:**
+First create-attempt accidentally produced a Cloudflare Worker (with `npx wrangler deploy`) instead of a Pages project. Recreated as Pages; auto-publishes `dist/`. Spec-aligned per architecture §5.2.
+
+**Repo:** https://github.com/gurub3174/ai-engineer-portfolio (public, main branch tracks origin)
+
+**Commits (post-scaffold):**
+- `d778bea` — close Phase 0: lockfile, build config, placeholder home, LH gates
+- `7413026` — feat(design): seed PRODUCT.md/DESIGN.md, amend rules, decisions log
+- `85fab0f` — docs(phase-0): content-conventions amendments + docs/
+
+**Phase 1 handoff:** see `docs/phase-1-handoff.md`. Fresh `/build` session recommended over continuing this consult session.
+
 **Next:**
 - Phase 1 skill invocations: `/impeccable shape` → `/typeset` → `/colorize` → `/animate` → build reference page → `/critique` + `/audit`
 - Section 10 critique prompt must explicitly name the second-order AI-slop test (per design-decisions.md §10)
