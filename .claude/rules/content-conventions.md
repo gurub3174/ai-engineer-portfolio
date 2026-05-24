@@ -1,6 +1,31 @@
 # Content Conventions — AI Engineer Portfolio
 
-Loaded when writing MDX content or editing case studies. Derived from `spec/architecture.md` §1.4 (Case-Study Discipline) and `spec/critical-review.md` C1 + M8.
+Loaded when writing MDX content, case studies, hero copy, About, build logs, blog posts, error messages, or UI microcopy. Derived from `spec/architecture.md` §1.4 (Case-Study Discipline), `spec/critical-review.md` C1 + M8, `PRODUCT.md` (voice), and the `impeccable` skill's copy laws.
+
+## Copy laws (impeccable — universal)
+
+- **No em dashes (`—`).** Use commas, colons, semicolons, periods, or parentheses. **Also not `--`** (the substitute fails the same way). Every em dash in user-facing copy is a rewrite. This applies to MDX bodies, hero pitches, About, microcopy, error pages, and frontmatter `summary` fields.
+- **Every word earns its place.** No restated headings. No intros that repeat the title. Section openers must add information, not paraphrase.
+- **No filler vocabulary.** "Leveraged," "scalable," "robust," "synergistic," "unlock," "delight," "seamless," "elevate," "empower" — LinkedIn-hustle tells. Replace with the specific thing.
+- **Specific over general.** Names of frameworks, exact dates (ISO format), numeric outcomes. "Sprint 0 committed at e6cb1af on 2026-05-01" beats "shipped early in the project."
+
+## Voice (per PRODUCT.md)
+
+- **Substantive over clever.** Teach the reader something on every surface.
+- **First-person for decisions:** "I picked Astro because…" not "Astro was chosen because…"
+- **Past-tense for outcomes:** "Sprint 0 shipped at e6cb1af with 49 files" not "Sprint 0 is shipping."
+- **What-didn't-work matters more than what-worked.** Lead case studies with the failure that taught you something.
+- **No hedge words** ("kind of," "sort of," "I think," "maybe"). Commit.
+
+## Forbidden phrases (auto-flag in review)
+
+- "In this post, we'll explore…"
+- "Let's dive in"
+- "Without further ado"
+- "Today I'm excited to…"
+- "Just shipped this little thing" (humblebrag minimalism)
+- "Leveraged [X] to drive [Y]"
+- "Revolutionizes," "transforms," "disrupts"
 
 ## Required project schema (Zod-enforced)
 
