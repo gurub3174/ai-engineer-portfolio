@@ -12,11 +12,12 @@
     "lint": "biome check .",
     "lint:fix": "biome check --apply .",
     "format": "biome format --write .",
-    "a11y": "axe ./dist --exit",
+    "a11y": "node ./scripts/a11y.mjs",
     "lh:desktop": "lhci autorun --config=./lighthouserc.json",
     "lh:mobile": "lhci autorun --config=./lighthouserc.mobile.json",
     "lh": "pnpm lh:desktop && pnpm lh:mobile",
-    "new-project": "node ./scripts/new-project.mjs"
+    "new-project": "node ./scripts/new-project.mjs",
+    "install-fonts": "node ./scripts/install-fonts.mjs"
   },
   "dependencies": {
     "@astrojs/check": "^0.9.9",
@@ -38,6 +39,7 @@
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
     "@types/three": "^0.170.0",
+    "sharp": "^0.34.5",
     "typescript": "^5.9.3"
   },
   "packageManager": "pnpm@9.0.0",

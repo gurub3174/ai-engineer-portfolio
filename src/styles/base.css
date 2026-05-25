@@ -1,0 +1,180 @@
+/*
+ * Base resets + body type + photographic atmosphere.
+ * Tokens from tokens.css. Order in BaseLayout: fonts.css -> tokens.css -> base.css -> page styles.
+ */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  font-family: var(--font-body);
+  font-size: 100%;
+  line-height: var(--lh-body);
+  color: var(--ink);
+  background: var(--bg-stage);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  font-kerning: normal;
+  font-feature-settings: "kern", "liga", "calt";
+  scroll-padding-top: 4vh;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* Vignette + film grain overlays — gentle photographic atmosphere, never CSS-glow.
+   Both gated by prefers-reduced-motion through token values in tokens.css. */
+body::before {
+  /* radial vignette */
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 100;
+  background: radial-gradient(ellipse 120% 90% at 50% 45%, transparent 40%, var(--vignette) 100%);
+}
+
+body::after {
+  /* film grain, SVG fractal noise inline as data URI */
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 101;
+  opacity: var(--grain-opacity);
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml;utf8,<svg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.95' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.5 0 0 0 0 0.5 0 0 0 0 0.5 0 0 0 0.7 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  background-size: 200px 200px;
+}
+
+/* Type roles — used by elements, not classes. Keeps markup semantic. */
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  color: var(--ink-strong);
+  margin: 0;
+  text-wrap: balance;
+}
+
+h1 {
+  font-size: var(--fs-h1);
+  line-height: var(--lh-tight);
+  letter-spacing: var(--ls-display);
+  max-width: var(--measure-wide);
+}
+
+h2 {
+  font-size: var(--fs-h2);
+  line-height: var(--lh-heading);
+  letter-spacing: var(--ls-heading);
+  max-width: var(--measure-wide);
+}
+
+h3 {
+  font-size: var(--fs-h3);
+  line-height: var(--lh-heading);
+  letter-spacing: var(--ls-heading);
+}
+
+h4 {
+  font-size: var(--fs-subhead);
+  line-height: var(--lh-heading);
+}
+
+p {
+  margin: 0 0 var(--space-base) 0;
+  max-width: var(--measure);
+  font-size: var(--fs-body);
+  color: var(--ink);
+}
+
+p.lede {
+  font-size: var(--fs-body-lg);
+  color: var(--ink-strong);
+  max-width: var(--measure-tight);
+  line-height: 1.55;
+}
+
+small,
+.caption {
+  font-size: var(--fs-caption);
+  color: var(--ink-faint);
+  line-height: var(--lh-caption);
+  letter-spacing: var(--ls-caption);
+}
+
+code,
+kbd,
+pre,
+samp {
+  font-family: var(--font-mono);
+  font-size: 0.92em;
+  color: var(--key-light-soft);
+}
+
+pre {
+  background: var(--surface-sunken);
+  border: 1px solid var(--border-hairline);
+  padding: var(--space-base);
+  overflow-x: auto;
+  font-size: var(--fs-small);
+  line-height: 1.55;
+  color: var(--ink);
+  border-radius: 2px;
+}
+
+a {
+  color: var(--key-light);
+  text-decoration: none;
+  border-bottom: 1px solid var(--border-key);
+  transition: color var(--dur-quick) var(--ease-focus-pull), border-color var(--dur-quick)
+    var(--ease-focus-pull);
+}
+
+a:hover,
+a:focus-visible {
+  color: var(--key-light-soft);
+  border-bottom-color: var(--key-light-soft);
+}
+
+/* Focus ring — visible, photographic, never default-removed. */
+:focus-visible {
+  outline: 2px solid var(--key-light);
+  outline-offset: 3px;
+  border-radius: 1px;
+}
+
+button {
+  font-family: inherit;
+  font-size: var(--fs-body);
+  cursor: pointer;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+::selection {
+  background: var(--key-light);
+  color: var(--bg-stage);
+}

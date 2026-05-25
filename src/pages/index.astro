@@ -1,98 +1,1199 @@
 ---
-// Phase 0 placeholder home page.
-// Real StudioTable home is built in Phase 2 per spec/implementation-plan.md.
-// This file exists to satisfy the Phase 0 exit criterion: "placeholder home deploys green on Cloudflare."
-// Real OKLCH tokens land in src/styles/tokens.css during Phase 1.
+import BaseLayout from '@layouts/BaseLayout.astro';
+import { Picture } from 'astro:assets';
+import homeBg from '@/assets/home-bg.png';
+import homeBinder from '@/assets/home-binder.png';
+import homeMic from '@/assets/home-mic.png';
+import homeBulb from '@/assets/home-bulb.png';
+
+/*
+ * Home — Phase 2 (v9, overlay + risks).
+ *
+ * Changes from v8:
+ *   - Site header: identity top-left, nav top-right (replaces old stamp meta-bar).
+ *   - Title + subhead + CTAs overlaid on the studio image instead of stacked above it.
+ *     Adds .scene-tint gradient on the left of the scene to guarantee AA contrast.
+ *   - "Data that works." title line italicized for editorial rhythm.
+ *   - Subhead widened to ~70ch (was 60ch). Still inside the impeccable 65–75ch readability law.
+ *   - Bulb moved up (y 83→80) so it doesn't run off the table edge.
+ *   - New section: "Production risks I design around." Four risks rendered as
+ *     editorial plates (serif numeral prefix, image placeholder, body, technique
+ *     strip). Dodges the "identical card grid" AI-slop ban via numeral framing.
+ *
+ * Zero hydrated JS. All interactivity is :has() + CSS transitions.
+ */
+
+const subjects = [
+  {
+    id: 'binder',
+    slug: 'doc-extractor',
+    name: 'Document extractor',
+    tip: 'Layout-aware PDF extraction for PE capital-call notices. Hybrid rules + LLM cut a 6-hour manual process to 12 minutes with 0.4% line-item error.',
+    role: 'hero',
+    pos: { x: 50, y: 80, w: 28 },
+    capGap: '-2rem',
+  },
+  {
+    id: 'mic',
+    slug: 'podcast',
+    name: 'Podcast pipeline',
+    tip: 'Audio sampling pipeline. A 90-minute episode condensed into a 6-bullet research brief, validated against the source transcript.',
+    role: 'supporting',
+    pos: { x: 74, y: 77, w: 15 },
+    capGap: '1rem',
+  },
+  {
+    id: 'bulb',
+    slug: 'ai-design-team',
+    name: 'AI design team',
+    tip: 'Four agents argue a design brief into a finished spec. The argumentation log itself is the deliverable.',
+    role: 'supporting',
+    pos: { x: 29, y: 80, w: 16 },
+    capGap: '-1rem',
+  },
+];
+
+const risks = [
+  {
+    n: '01',
+    slug: 'bad-inputs',
+    title: 'Bad inputs, bad context',
+    body: 'AI systems fail when the model receives incomplete, excessive, stale, or irrelevant context.',
+    techniques: [
+      'Clean ingestion',
+      'metadata design',
+      'chunking strategy',
+      'retrieval testing',
+      'context filtering',
+    ],
+  },
+  {
+    n: '02',
+    slug: 'untrusted-outputs',
+    title: 'Untrusted outputs',
+    body: 'A fluent answer is not the same as a reliable answer. Outputs need constraints before they can be used.',
+    techniques: [
+      'Structured outputs',
+      'schema validation',
+      'confidence flags',
+      'business rules',
+      'deterministic contracts',
+    ],
+  },
+  {
+    n: '03',
+    slug: 'no-evaluation-loop',
+    title: 'No evaluation loop',
+    body: 'Without a formal review process, teams cannot tell whether the system is improving, drifting, or failing.',
+    techniques: [
+      'Eval sets',
+      'human review',
+      'editable outputs',
+      'approval states',
+      'audit trails',
+    ],
+  },
+  {
+    n: '04',
+    slug: 'silent-failure',
+    title: 'Silent failure',
+    body: 'If no one can see when the system breaks, the system cannot be trusted.',
+    techniques: [
+      'Logging',
+      'monitoring',
+      'exception queues',
+      'feedback loops',
+      'production alerts',
+    ],
+  },
+];
 ---
 
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="description" content="Portfolio site in build phase. Phase 0 placeholder; full site lands at launch." />
-    <title>Portfolio — in build</title>
-    <style>
-      :root {
-        --bg-stage: oklch(0.14 0.008 65);
-        --ink: oklch(0.92 0.012 65);
-        --ink-muted: oklch(0.62 0.010 65);
-        --key-light: oklch(0.74 0.160 65);
-      }
+<BaseLayout
+  title="Guru Balamurugan · AI Engineer"
+  description="AI that ships. Data that works. A portfolio of AI/data engineering work, presented as a small studio of warm light: three projects on a round wooden table under a softbox."
+>
+  <a href="#studio" class="skip-link">Skip to the studio</a>
 
-      *,
-      *::before,
-      *::after {
-        box-sizing: border-box;
-      }
+  <main>
+    <section
+      id="studio"
+      class="studio"
+      aria-label="Studio shoot: three projects on a round wooden table"
+    >
+      <div class="scene">
+        <Picture
+          src={homeBg}
+          formats={['avif', 'webp']}
+          fallbackFormat="jpg"
+          widths={[480, 768, 1024, 1440, 1920, 2560, 3200]}
+          sizes="100vw"
+          alt="Empty studio scene: a round wooden table lit by a softbox on the left, against a deep warm cove background."
+          loading="eager"
+          fetchpriority="high"
+          quality={78}
+          pictureAttributes={{ class: 'scene-bg' }}
+        />
 
-      html,
-      body {
-        margin: 0;
-        padding: 0;
-        background: var(--bg-stage);
-        color: var(--ink);
-      }
+        <div class="scene-tint" aria-hidden="true"></div>
 
-      body {
-        min-height: 100vh;
-        display: grid;
-        place-items: center;
-        padding: 2rem 1.5rem;
-        font-family: serif;
-        line-height: 1.6;
-      }
+        <header class="site-nav">
+          <div class="site-nav-inner">
+            <a class="identity" href="/" aria-label="Guru Balamurugan — home">
+              <span class="identity-name">Guru Balamurugan</span>
+              <span class="identity-sep" aria-hidden="true">·</span>
+              <span class="identity-role">AI Engineer</span>
+            </a>
 
-      main {
-        max-width: 38rem;
-      }
+            <nav class="primary-nav" aria-label="Primary">
+              <a href="#studio">Projects</a>
+              <a href="/resume">Resume</a>
+              <a href="/about">About</a>
+              <a href="/contact">Contact</a>
+            </nav>
+          </div>
+        </header>
 
-      h1 {
-        font-size: clamp(1.6rem, 4.5vw, 2.6rem);
-        font-weight: 400;
-        margin: 0 0 1.5rem 0;
-        letter-spacing: -0.01em;
-      }
+        <div class="scene-overlay" aria-labelledby="title">
+          <h1 id="title" class="title">
+            <span class="title-line">AI that ships.</span>
+            <span class="title-line title-line--soft">Data that works.</span>
+          </h1>
 
-      h1 span {
-        color: var(--key-light);
-      }
+          <p class="subhead">
+            AI prototypes are easy to impress with and hard to trust. I bring a data
+            engineering foundation to AI engineering, building the data, retrieval,
+            evaluation, and operational layers that turn promising demos into reliable
+            production systems.
+          </p>
 
-      p {
-        color: var(--ink-muted);
-        margin: 0 0 0.85rem 0;
-        max-width: 65ch;
-      }
+          <ul class="cta-row" role="list">
+            <li>
+              <a class="cta cta--primary" href="#risks">
+                Explore projects
+              </a>
+            </li>
+            <li>
+              <a class="cta cta--quiet" href="/resume">
+                View resume
+              </a>
+            </li>
+          </ul>
+        </div>
 
-      code {
-        font-family: monospace;
-        color: var(--key-light);
-        font-size: 0.92em;
-      }
+        <ol class="products" role="list">
+          {subjects.map((s) => (
+            <li
+              class={`product product--${s.id} ${s.role === 'hero' ? 'is-default' : ''}`}
+              style={`--px: ${s.pos.x}%; --py: ${s.pos.y}%; --pw: ${s.pos.w}%; --cap-gap: ${s.capGap};`}
+            >
+              <a
+                class={`product-link product-link--${s.id}`}
+                href={`/projects/${s.slug}`}
+                aria-describedby={`tip-${s.id}`}
+              >
+                <span class="cutout-wrap">
+                  {s.id === 'binder' && (
+                    <Picture
+                      src={homeBinder}
+                      formats={['avif', 'webp']}
+                      fallbackFormat="png"
+                      widths={[200, 320, 480, 640]}
+                      sizes="(min-width: 1280px) 320px, (min-width: 768px) 25vw, 30vw"
+                      alt=""
+                      loading="eager"
+                      quality={78}
+                    />
+                  )}
+                  {s.id === 'mic' && (
+                    <Picture
+                      src={homeMic}
+                      formats={['avif', 'webp']}
+                      fallbackFormat="png"
+                      widths={[140, 220, 320]}
+                      sizes="(min-width: 1280px) 140px, (min-width: 768px) 10vw, 14vw"
+                      alt=""
+                      loading="eager"
+                      quality={78}
+                    />
+                  )}
+                  {s.id === 'bulb' && (
+                    <Picture
+                      src={homeBulb}
+                      formats={['avif', 'webp']}
+                      fallbackFormat="png"
+                      widths={[140, 220, 320]}
+                      sizes="(min-width: 1280px) 150px, (min-width: 768px) 11vw, 15vw"
+                      alt=""
+                      loading="eager"
+                      quality={78}
+                    />
+                  )}
+                </span>
+                <span class="caption">
+                  <span class="name">{s.name}</span>
+                </span>
+              </a>
+              <p
+                id={`tip-${s.id}`}
+                class={`tip tip--${s.id}`}
+                role="tooltip"
+              >
+                {s.tip}
+              </p>
+            </li>
+          ))}
+        </ol>
+      </div>
+    </section>
 
-      .meta {
-        margin-top: 2rem;
-        font-size: 0.85rem;
-        color: var(--ink-muted);
-        opacity: 0.7;
-      }
-    </style>
-  </head>
-  <body>
-    <main>
-      <h1>Portfolio <span>in build</span></h1>
-      <p>Phase 0 placeholder. The real home page lands in Phase 2.</p>
-      <p>Current state: Astro 5 scaffold up, CI gates wired (desktop + mobile Lighthouse), design system locked, OKLCH tokens deferred to Phase 1.</p>
-      <p>
-        Routes coming online during the build:
-        <code>/projects/podcast</code>,
-        <code>/projects/doc-extractor</code>,
-        <code>/projects/ai-design-team</code>,
-        <code>/about</code>,
-        <code>/contact</code>,
-        <code>/now</code>.
-      </p>
-      <p class="meta">Build started 2026-05-22. Launch target 2026-06-21.</p>
-    </main>
-  </body>
-</html>
+    <section id="risks" class="risks" aria-labelledby="risks-title">
+      <header class="risks-head">
+        <p class="risks-eyebrow">Selected · risks</p>
+        <h2 id="risks-title" class="risks-title">
+          Production risks I design around.
+        </h2>
+        <p class="risks-deck">
+          The work is organized around what fails in production, not which model is in fashion.
+          Each plate below names a failure mode and the engineering layer that prevents it.
+        </p>
+      </header>
+
+      <ol class="risk-grid" role="list">
+        {risks.map((r) => (
+          <li class={`risk risk--${r.slug}`}>
+            <div class="risk-thumb" aria-hidden="true">
+              <span class="risk-thumb-meta">Plate / placeholder</span>
+            </div>
+            <div class="risk-body">
+              <p class="risk-number">
+                <span class="risk-number-numeral">{r.n}</span>
+                <span class="risk-number-slash">/</span>
+              </p>
+              <h3 class="risk-title">{r.title}</h3>
+              <p class="risk-text">{r.body}</p>
+              <p class="risk-techniques">
+                {r.techniques.map((t, i) => (
+                  <>
+                    {i > 0 && <span class="risk-tech-sep" aria-hidden="true"> · </span>}
+                    <span class="risk-tech">{t}</span>
+                  </>
+                ))}
+              </p>
+            </div>
+          </li>
+        ))}
+      </ol>
+    </section>
+  </main>
+
+  <footer class="page-footer">
+    <p class="footer-line">
+      The work, lit and labeled. Case studies under each subject.
+    </p>
+    <ul class="footer-links" role="list">
+      <li><a href="https://github.com/" rel="me noreferrer">GitHub</a></li>
+      <li><a href="https://www.linkedin.com/" rel="me noreferrer">LinkedIn</a></li>
+      <li><a href="/about">About</a></li>
+      <li><a href="/contact">Contact</a></li>
+    </ul>
+    <p class="footer-meta">Astro · Cloudflare Pages · open source · 2026</p>
+  </footer>
+</BaseLayout>
+
+<style>
+  /* ============================================================
+   * Skip link
+   * ============================================================ */
+  .skip-link {
+    position: absolute;
+    left: var(--container-edge);
+    top: var(--container-edge);
+    padding: var(--space-snug) var(--space-base);
+    background: var(--surface-raised);
+    color: var(--key-light);
+    border: 1px solid var(--border-key);
+    border-radius: 2px;
+    z-index: 300;
+    transform: translateY(-200%);
+    transition: transform var(--dur-quick) var(--ease-focus-pull);
+  }
+
+  .skip-link:focus-visible {
+    transform: translateY(0);
+  }
+
+  /* ============================================================
+   * Shell — only the content sections below the hero stay constrained.
+   * Studio + site-nav are full-bleed inside the hero scene.
+   * ============================================================ */
+  .risks,
+  .page-footer {
+    width: 100%;
+    max-width: var(--container-wide);
+    margin-inline: auto;
+    padding-inline: var(--container-edge);
+  }
+
+  /* ============================================================
+   * Site header — overlaid on the studio image (top edge of scene).
+   * Inner wrapper carries the content-width alignment so identity and
+   * primary-nav still line up with the risks / footer sections below.
+   * ============================================================ */
+  .site-nav {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 4;
+    padding-block: var(--space-roomy) var(--space-loose);
+    pointer-events: none;
+  }
+
+  .site-nav-inner {
+    max-width: var(--container-wide);
+    margin-inline: auto;
+    padding-inline: var(--container-edge);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-loose);
+    flex-wrap: wrap;
+    pointer-events: auto;
+  }
+
+  .identity {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.45ch;
+    text-decoration: none;
+    color: inherit;
+    font-family: var(--font-display);
+  }
+
+  .identity-name {
+    font-size: var(--fs-body-lg);
+    font-weight: 600;
+    color: var(--ink-strong);
+    letter-spacing: var(--ls-heading);
+  }
+
+  .identity-sep {
+    color: var(--ink-faint);
+    font-size: var(--fs-body-lg);
+  }
+
+  .identity-role {
+    font-family: var(--font-mono);
+    font-size: var(--fs-caption);
+    color: var(--ink-faint);
+    letter-spacing: var(--ls-meta-allcaps);
+    text-transform: uppercase;
+    align-self: center;
+    margin-left: 0.4ch;
+  }
+
+  .primary-nav {
+    display: flex;
+    gap: var(--space-loose);
+    flex-wrap: wrap;
+  }
+
+  .primary-nav a {
+    font-family: var(--font-body);
+    font-size: var(--fs-small);
+    color: var(--ink-muted);
+    text-decoration: none;
+    padding: var(--space-tight) 0;
+    border-bottom: 1px solid transparent;
+    transition:
+      color var(--dur-quick) var(--ease-focus-pull),
+      border-color var(--dur-quick) var(--ease-focus-pull);
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .primary-nav a:hover,
+  .primary-nav a:focus-visible {
+    color: var(--ink-strong);
+    border-bottom-color: var(--key-light);
+  }
+
+  .primary-nav a:focus-visible {
+    outline: 2px solid var(--key-light);
+    outline-offset: 4px;
+  }
+
+  /* ============================================================
+   * Studio scene — full-bleed letterbox hero, no side gutters.
+   * ============================================================ */
+  .studio {
+    position: relative;
+    width: 100%;
+    margin: 0;
+    overflow: visible;
+    scroll-margin-top: 6vh;
+  }
+
+  .scene {
+    position: relative;
+    width: 100%;
+    min-height: 70vh;
+    aspect-ratio: 21 / 9;
+    overflow: hidden;
+  }
+
+  :global(.scene-bg),
+  :global(.scene-bg img) {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+  }
+
+  :global(.scene-bg) {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+  }
+
+  :global(.scene-bg img) {
+    transition:
+      filter var(--dur-considered) var(--ease-illuminate);
+  }
+
+  /* Contrast tint — top + left compound gradient. Top layer covers the
+     nav row; left layer covers identity and title. Both fade out toward
+     the products so the photograph stays visible there. */
+  .scene-tint {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    background:
+      linear-gradient(
+        180deg,
+        oklch(0.07 0.005 65 / 0.55) 0%,
+        oklch(0.07 0.005 65 / 0.30) 14%,
+        transparent 28%
+      ),
+      linear-gradient(
+        100deg,
+        oklch(0.07 0.005 65 / 0.72) 0%,
+        oklch(0.07 0.005 65 / 0.52) 26%,
+        oklch(0.07 0.005 65 / 0.18) 55%,
+        transparent 75%
+      );
+  }
+
+  /* Background dim on product hover — combined with the focused-product halo */
+  .studio:has(.product-link:hover) :global(.scene-bg img),
+  .studio:has(.product-link:focus-visible) :global(.scene-bg img) {
+    filter: brightness(0.50) saturate(0.85);
+  }
+
+  /* ============================================================
+   * Overlay — title + subhead + CTAs sit on the photograph
+   * ============================================================ */
+  .scene-overlay {
+    position: absolute;
+    z-index: 2;
+    top: 18%;
+    left: 5%;
+    right: auto;
+    width: min(62%, 46rem);
+    padding: 0;
+    pointer-events: none;
+  }
+
+  .scene-overlay > * {
+    pointer-events: auto;
+  }
+
+  .title {
+    font-family: var(--font-display);
+    font-size: var(--fs-display);
+    font-weight: 600;
+    line-height: 0.98;
+    letter-spacing: var(--ls-display);
+    color: var(--ink-strong);
+    margin: 0;
+    max-width: 18ch;
+    text-wrap: balance;
+    display: flex;
+    flex-direction: column;
+    gap: 0.04em;
+  }
+
+  .title-line {
+    display: block;
+  }
+
+  .title-line--soft {
+    font-style: italic;
+    color: var(--ink-muted);
+  }
+
+  .subhead {
+    margin: var(--space-base) 0 0;
+    max-width: 70ch;
+    color: var(--ink);
+    font-family: var(--font-body);
+    font-size: var(--fs-body-lg);
+    line-height: 1.5;
+  }
+
+  .cta-row {
+    list-style: none;
+    margin: var(--space-loose) 0 0;
+    padding: 0;
+    display: flex;
+    gap: var(--space-loose);
+    flex-wrap: wrap;
+  }
+
+  .cta {
+    font-family: var(--font-body);
+    font-size: var(--fs-body);
+    font-weight: 500;
+    color: var(--key-light);
+    text-decoration: none;
+    padding-bottom: 2px;
+    border-bottom: 1px solid currentColor;
+    transition:
+      color var(--dur-quick) var(--ease-focus-pull),
+      border-color var(--dur-quick) var(--ease-focus-pull);
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .cta::after {
+    content: ' →';
+    white-space: nowrap;
+    margin-left: 0.2ch;
+    transition: transform var(--dur-quick) var(--ease-focus-pull);
+    display: inline-block;
+  }
+
+  .cta:hover,
+  .cta:focus-visible {
+    color: var(--ink-strong);
+    border-color: var(--ink-strong);
+  }
+
+  .cta:hover::after,
+  .cta:focus-visible::after {
+    transform: translateX(3px);
+  }
+
+  .cta:focus-visible {
+    outline: 2px solid var(--key-light);
+    outline-offset: 6px;
+    border-color: transparent;
+  }
+
+  .cta--quiet {
+    color: var(--ink-muted);
+  }
+
+  /* ============================================================
+   * Products — layered cutouts on the table
+   * ============================================================ */
+  .products {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .product {
+    position: absolute;
+    left: var(--px);
+    top: var(--py);
+    width: var(--pw);
+    transform: translate(-50%, -100%);
+    margin: 0;
+    padding: 0;
+  }
+
+  .product-link {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-decoration: none;
+    border: none;
+    color: inherit;
+    min-height: 44px;
+    min-width: 44px;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+
+  .product-link:focus-visible {
+    outline: 2px solid var(--key-light);
+    outline-offset: 8px;
+  }
+
+  .cutout-wrap {
+    display: block;
+    width: 100%;
+    line-height: 0;
+    filter:
+      blur(2.5px)
+      brightness(0.86)
+      saturate(0.92);
+    transition:
+      filter var(--dur-considered) var(--ease-focus-pull),
+      transform var(--dur-considered) var(--ease-focus-pull);
+    will-change: filter, transform;
+  }
+
+  .cutout-wrap :global(picture),
+  .cutout-wrap :global(img) {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  /* Highlight recipe — halo + camera focus + filament ignition */
+  .product.is-default .cutout-wrap,
+  .products:has(.product-link--binder:hover) .product--binder .cutout-wrap,
+  .products:has(.product-link--binder:focus-visible) .product--binder .cutout-wrap,
+  .products:has(.product-link--mic:hover) .product--mic .cutout-wrap,
+  .products:has(.product-link--mic:focus-visible) .product--mic .cutout-wrap {
+    filter:
+      brightness(1.12)
+      saturate(1.06)
+      drop-shadow(0 0 26px oklch(0.74 0.155 65 / 0.45))
+      drop-shadow(8px 12px 14px oklch(0.04 0.003 65 / 0.55));
+    transform: scale(1.025);
+  }
+
+  .products:has(.product-link--bulb:hover) .product--bulb .cutout-wrap,
+  .products:has(.product-link--bulb:focus-visible) .product--bulb .cutout-wrap {
+    filter:
+      brightness(1.32)
+      saturate(1.22)
+      drop-shadow(0 0 36px oklch(0.74 0.155 65 / 0.65))
+      drop-shadow(0 0 14px oklch(0.82 0.085 78 / 0.45))
+      drop-shadow(8px 12px 14px oklch(0.04 0.003 65 / 0.55));
+    transform: scale(1.025);
+    transition:
+      filter var(--dur-cinematic) var(--ease-illuminate),
+      transform var(--dur-considered) var(--ease-focus-pull);
+  }
+
+  .products:has(.product-link--mic:hover) .product--binder .cutout-wrap,
+  .products:has(.product-link--mic:focus-visible) .product--binder .cutout-wrap,
+  .products:has(.product-link--bulb:hover) .product--binder .cutout-wrap,
+  .products:has(.product-link--bulb:focus-visible) .product--binder .cutout-wrap {
+    filter:
+      blur(2.5px)
+      brightness(0.86)
+      saturate(0.92);
+    transform: none;
+  }
+
+  /* Captions */
+  .caption {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: var(--cap-gap, 0.5rem);
+    text-align: center;
+    transition:
+      opacity var(--dur-quick) var(--ease-focus-pull),
+      color var(--dur-quick) var(--ease-focus-pull);
+    opacity: 0.7;
+  }
+
+  .name {
+    font-family: var(--font-display);
+    font-size: var(--fs-small);
+    color: var(--ink);
+    font-weight: 600;
+    line-height: 1.2;
+    white-space: nowrap;
+  }
+
+  .product.is-default .caption,
+  .products:has(.product-link--binder:hover) .product--binder .caption,
+  .products:has(.product-link--binder:focus-visible) .product--binder .caption,
+  .products:has(.product-link--mic:hover) .product--mic .caption,
+  .products:has(.product-link--mic:focus-visible) .product--mic .caption,
+  .products:has(.product-link--bulb:hover) .product--bulb .caption,
+  .products:has(.product-link--bulb:focus-visible) .product--bulb .caption {
+    opacity: 1;
+  }
+
+  .product.is-default .name,
+  .products:has(.product-link--binder:hover) .product--binder .name,
+  .products:has(.product-link--binder:focus-visible) .product--binder .name,
+  .products:has(.product-link--mic:hover) .product--mic .name,
+  .products:has(.product-link--mic:focus-visible) .product--mic .name,
+  .products:has(.product-link--bulb:hover) .product--bulb .name,
+  .products:has(.product-link--bulb:focus-visible) .product--bulb .name {
+    color: var(--key-light);
+  }
+
+  .products:has(.product-link--mic:hover) .product--binder .caption,
+  .products:has(.product-link--mic:focus-visible) .product--binder .caption,
+  .products:has(.product-link--bulb:hover) .product--binder .caption,
+  .products:has(.product-link--bulb:focus-visible) .product--binder .caption {
+    opacity: 0.7;
+  }
+
+  .products:has(.product-link--mic:hover) .product--binder .name,
+  .products:has(.product-link--mic:focus-visible) .product--binder .name,
+  .products:has(.product-link--bulb:hover) .product--binder .name,
+  .products:has(.product-link--bulb:focus-visible) .product--binder .name {
+    color: var(--ink);
+  }
+
+  /* Tip — hover-revealed description anchored above the cutout */
+  .tip {
+    position: absolute;
+    bottom: calc(100% + 0.5rem);
+    left: 50%;
+    transform: translateX(-50%) translateY(0.4rem);
+    width: max-content;
+    max-width: 26ch;
+    margin: 0;
+    padding: var(--space-snug) var(--space-base);
+    background: var(--surface-raised);
+    border: 1px solid var(--border-hairline);
+    border-radius: 3px;
+    color: var(--ink);
+    font-family: var(--font-body);
+    font-size: var(--fs-small);
+    line-height: 1.4;
+    text-align: center;
+    opacity: 0;
+    pointer-events: none;
+    transition:
+      opacity var(--dur-quick) var(--ease-focus-pull),
+      transform var(--dur-quick) var(--ease-focus-pull);
+    z-index: 20;
+  }
+
+  .tip::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    width: 8px;
+    height: 8px;
+    background: var(--surface-raised);
+    border-right: 1px solid var(--border-hairline);
+    border-bottom: 1px solid var(--border-hairline);
+    margin-top: -4px;
+    transform: translateX(-50%) rotate(45deg);
+  }
+
+  .product:has(.product-link:hover) .tip,
+  .product:has(.product-link:focus-visible) .tip {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  /* ============================================================
+   * Risks — production risks I design around
+   * ============================================================
+   * Editorial plates, NOT a SaaS card grid:
+   *   - Serif numeral (01) is the visual anchor, no rounded icon tile
+   *   - Hairline borders only; no nested cards inside cards
+   *   - Image placeholder is landscape (photo-studio frame)
+   *   - Technique strip is mono, hairline divider above
+   * ============================================================ */
+  .risks {
+    padding-top: var(--space-vast);
+    padding-bottom: var(--space-spacious);
+    scroll-margin-top: 6vh;
+  }
+
+  .risks-head {
+    max-width: var(--measure-wide);
+    margin-bottom: var(--space-spacious);
+  }
+
+  .risks-eyebrow {
+    font-family: var(--font-mono);
+    font-size: var(--fs-caption);
+    color: var(--ink-faint);
+    letter-spacing: var(--ls-meta-allcaps);
+    text-transform: uppercase;
+    margin: 0 0 var(--space-snug);
+  }
+
+  .risks-title {
+    font-family: var(--font-display);
+    font-size: var(--fs-h2);
+    font-weight: 600;
+    line-height: var(--lh-heading);
+    letter-spacing: var(--ls-heading);
+    color: var(--ink-strong);
+    margin: 0;
+    max-width: 22ch;
+    text-wrap: balance;
+  }
+
+  .risks-deck {
+    margin: var(--space-base) 0 0;
+    color: var(--ink-muted);
+    font-size: var(--fs-body-lg);
+    line-height: 1.55;
+    max-width: 68ch;
+  }
+
+  .risk-grid {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-spacious) var(--space-roomy);
+  }
+
+  .risk {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-base);
+  }
+
+  .risk-thumb {
+    aspect-ratio: 4 / 3;
+    background:
+      linear-gradient(
+        135deg,
+        var(--surface-raised) 0%,
+        var(--surface) 100%
+      );
+    border: 1px solid var(--border-hairline);
+    border-radius: 3px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .risk-thumb::before {
+    /* Corner registration mark — hints at a contact-sheet frame */
+    content: '';
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    width: 18px;
+    height: 18px;
+    border-top: 1px solid var(--border-key);
+    border-left: 1px solid var(--border-key);
+    opacity: 0.55;
+  }
+
+  .risk-thumb::after {
+    content: '';
+    position: absolute;
+    bottom: 8px;
+    right: 8px;
+    width: 18px;
+    height: 18px;
+    border-bottom: 1px solid var(--border-key);
+    border-right: 1px solid var(--border-key);
+    opacity: 0.55;
+  }
+
+  .risk-thumb-meta {
+    font-family: var(--font-mono);
+    font-size: var(--fs-caption);
+    color: var(--ink-faint);
+    letter-spacing: var(--ls-caption);
+    text-transform: uppercase;
+  }
+
+  .risk-body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-snug);
+  }
+
+  .risk-number {
+    margin: 0;
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.3ch;
+    font-family: var(--font-display);
+    color: var(--key-light);
+  }
+
+  .risk-number-numeral {
+    font-size: var(--fs-h2);
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    line-height: 1;
+  }
+
+  .risk-number-slash {
+    font-size: var(--fs-h3);
+    color: var(--ink-faint);
+    font-weight: 400;
+  }
+
+  .risk-title {
+    font-family: var(--font-display);
+    font-size: var(--fs-h3);
+    font-weight: 600;
+    line-height: var(--lh-heading);
+    letter-spacing: var(--ls-heading);
+    color: var(--ink-strong);
+    margin: 0;
+    text-wrap: balance;
+  }
+
+  .risk-text {
+    margin: 0;
+    color: var(--ink);
+    font-size: var(--fs-body);
+    line-height: 1.55;
+    max-width: 56ch;
+  }
+
+  .risk-techniques {
+    margin: var(--space-snug) 0 0;
+    padding-top: var(--space-snug);
+    border-top: 1px solid var(--border-hairline);
+    font-family: var(--font-mono);
+    font-size: var(--fs-caption);
+    color: var(--ink-muted);
+    line-height: 1.6;
+    letter-spacing: var(--ls-caption);
+  }
+
+  .risk-tech-sep {
+    color: var(--ink-faint);
+  }
+
+  /* ============================================================
+   * Footer
+   * ============================================================ */
+  .page-footer {
+    padding-top: var(--space-spacious);
+    padding-bottom: var(--space-roomy);
+    border-top: 1px solid var(--border-hairline);
+    margin-top: var(--space-roomy);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-base);
+    text-align: center;
+  }
+
+  .footer-line {
+    margin: 0;
+    max-width: 50ch;
+    color: var(--ink-muted);
+    font-size: var(--fs-body);
+  }
+
+  .footer-links {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--space-loose);
+  }
+
+  .footer-links a {
+    font-family: var(--font-body);
+    font-size: var(--fs-small);
+  }
+
+  .footer-meta {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: var(--fs-caption);
+    color: var(--ink-faint);
+    letter-spacing: 0.02em;
+  }
+
+  /* ============================================================
+   * Entrance — staggered fade-in
+   * ============================================================ */
+  @keyframes fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes title-rise {
+    from { opacity: 0; transform: translateY(0.4rem); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes rise-in {
+    from {
+      opacity: 0;
+      transform: translate(-50%, calc(-100% + 0.6rem));
+    }
+    to {
+      opacity: 1;
+      transform: translate(-50%, -100%);
+    }
+  }
+
+  .site-nav { animation: fade-in var(--dur-considered) var(--ease-shutter) both; }
+  .scene-bg { animation: fade-in var(--dur-cinematic) var(--ease-shutter) 100ms both; }
+
+  .title-line,
+  .subhead,
+  .cta-row {
+    animation: title-rise var(--dur-considered) var(--ease-shutter) both;
+  }
+
+  .title-line:nth-child(1) { animation-delay: 240ms; }
+  .title-line:nth-child(2) { animation-delay: 360ms; }
+  .subhead { animation-delay: 500ms; }
+  .cta-row { animation-delay: 620ms; }
+
+  .product {
+    animation: rise-in var(--dur-considered) var(--ease-shutter) both;
+  }
+
+  .product--binder { animation-delay: 740ms; }
+  .product--mic { animation-delay: 880ms; }
+  .product--bulb { animation-delay: 1020ms; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .site-nav,
+    .scene-bg,
+    .title-line,
+    .subhead,
+    .cta-row,
+    .product {
+      animation: none;
+    }
+    .cutout-wrap,
+    .tip {
+      transition: none;
+    }
+  }
+
+  /* ============================================================
+   * Responsive
+   * ============================================================ */
+  @media (max-width: 900px) {
+    .scene {
+      aspect-ratio: 4 / 3;
+      min-height: auto;
+    }
+
+    .scene-overlay {
+      width: min(70%, 32rem);
+      top: 16%;
+      left: 5%;
+    }
+
+    .risk-grid {
+      gap: var(--space-roomy);
+    }
+  }
+
+  @media (max-width: 640px) {
+    .scene {
+      aspect-ratio: 4 / 5;
+      min-height: auto;
+    }
+
+    /* Overlay stays absolute on the photograph; widen it for narrow viewports.
+       Tint stays — it's still doing contrast work behind the title. */
+    .scene-overlay {
+      width: 88%;
+      top: 4%;
+      left: 4%;
+    }
+
+    /* Reposition products for vertical scene */
+    .product--binder {
+      --px: 50%;
+      --py: 64%;
+      --pw: 42%;
+      --cap-gap: -2.5rem;
+    }
+    .product--mic {
+      --px: 76%;
+      --py: 80%;
+      --pw: 18%;
+      --cap-gap: 0.75rem;
+    }
+    .product--bulb {
+      --px: 24%;
+      --py: 78%;
+      --pw: 22%;
+      --cap-gap: -1rem;
+    }
+
+    .cutout-wrap {
+      filter: brightness(0.90) saturate(0.95);
+    }
+
+    .product.is-default .cutout-wrap,
+    .products:has(.product-link--binder:hover) .product--binder .cutout-wrap,
+    .products:has(.product-link--binder:focus-visible) .product--binder .cutout-wrap,
+    .products:has(.product-link--mic:hover) .product--mic .cutout-wrap,
+    .products:has(.product-link--mic:focus-visible) .product--mic .cutout-wrap {
+      filter:
+        brightness(1.12)
+        saturate(1.06)
+        drop-shadow(0 0 18px oklch(0.74 0.155 65 / 0.40))
+        drop-shadow(6px 10px 12px oklch(0.04 0.003 65 / 0.45));
+    }
+
+    .products:has(.product-link--bulb:hover) .product--bulb .cutout-wrap,
+    .products:has(.product-link--bulb:focus-visible) .product--bulb .cutout-wrap {
+      filter:
+        brightness(1.30)
+        saturate(1.20)
+        drop-shadow(0 0 24px oklch(0.74 0.155 65 / 0.55))
+        drop-shadow(0 0 10px oklch(0.82 0.085 78 / 0.40))
+        drop-shadow(6px 10px 12px oklch(0.04 0.003 65 / 0.45));
+    }
+
+    .products:has(.product-link--mic:hover) .product--binder .cutout-wrap,
+    .products:has(.product-link--mic:focus-visible) .product--binder .cutout-wrap,
+    .products:has(.product-link--bulb:hover) .product--binder .cutout-wrap,
+    .products:has(.product-link--bulb:focus-visible) .product--binder .cutout-wrap {
+      filter: brightness(0.90) saturate(0.95);
+    }
+
+    .footer-links {
+      gap: var(--space-base);
+    }
+
+    .tip {
+      max-width: 18ch;
+      font-size: var(--fs-caption);
+    }
+
+    .risk-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .primary-nav {
+      gap: var(--space-base);
+    }
+
+    .primary-nav a {
+      font-size: var(--fs-caption);
+    }
+  }
+
+  @media (max-width: 380px) {
+    .title {
+      font-size: var(--fs-h1);
+    }
+  }
+</style>

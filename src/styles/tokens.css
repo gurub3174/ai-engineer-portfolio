@@ -1,0 +1,117 @@
+/*
+ * Design tokens — AI Engineer Portfolio
+ * Locked Phase 1 (2026-05-23). Source of truth at build time.
+ *
+ * Color: OKLCH only. Every neutral tinted toward the warm-tungsten brand hue.
+ * Hue anchor 65deg (warm amber), chroma 0.005-0.16, lightness scale 0.10-0.96.
+ *
+ * Provenance and rationale: docs/design-decisions.md sections 7-9.
+ */
+
+:root {
+  /* === COLOR — committed strategy, warm tungsten carries 30-60% of identity surface === */
+
+  /* Surfaces — deep tinted cove + warmer desk plane */
+  --bg-stage: oklch(0.13 0.008 65); /* deep cove background */
+  --surface: oklch(0.17 0.012 65); /* warm-tinted desk plane under subjects */
+  --surface-raised: oklch(0.21 0.014 65); /* lifted card / specimen card */
+  --surface-sunken: oklch(0.1 0.008 65); /* recess / blockquote / code well */
+
+  /* Lights — two warm sources at different angles, NO fill in V1 */
+  --key-light: oklch(0.74 0.155 65); /* warm tungsten ~3000K equivalent */
+  --key-light-soft: oklch(0.78 0.11 65); /* hover / link rest */
+  --rim-light: oklch(0.82 0.085 78); /* warmer-than-key rim ~3200K equivalent */
+
+  /* Ink — body text floor passes WCAG AAA (>= 7:1) on --bg-stage */
+  --ink: oklch(0.95 0.01 65); /* primary body, ~16.8:1 on bg-stage */
+  --ink-strong: oklch(0.98 0.006 65); /* headings */
+  --ink-muted: oklch(0.72 0.014 65); /* captions, secondary text, ~7.4:1 on bg-stage */
+  --ink-faint: oklch(0.68 0.014 65); /* meta, frame numbers, contact-sheet stamps — AA Normal pass on bg-stage and surface */
+
+  /* Atmosphere — photographic effects */
+  --vignette: oklch(0.05 0.005 65 / 0.55); /* corner darkening overlay */
+  --grain-opacity: 0.045; /* film grain magnitude — locked */
+  --dof-blur: 6px; /* depth-of-field defocus radius — locked */
+
+  /* Borders — hairline only, never side-stripe */
+  --border-hairline: oklch(0.3 0.012 65 / 0.65);
+  --border-key: oklch(0.74 0.155 65 / 0.7);
+
+  /* === TYPOGRAPHY === */
+
+  /* Family stacks. Self-hosted woff2 at /public/fonts/ (see public/fonts/README.md). */
+  --font-display: "Source Serif 4", "Source Serif Pro", "Iowan Old Style", "Cambria", "Georgia",
+    serif;
+  --font-body: "Geist Sans", "Geist", "Helvetica Neue", "Arial", sans-serif;
+  --font-mono: "Geist Mono", "JetBrains Mono", "SF Mono", "Menlo", "Consolas", monospace;
+
+  /* Scale — modular 1.25, fixed rem at base, fluid clamp at display sizes.
+     Body 16px = 1rem anchor. Hierarchy ratio >= 1.25 between every step. */
+  --fs-caption: 0.75rem; /* 12px */
+  --fs-small: 0.875rem; /* 14px */
+  --fs-body: 1rem; /* 16px — base */
+  --fs-body-lg: 1.25rem; /* 20px — lede / pull quotes */
+  --fs-subhead: clamp(1.4rem, 1.1rem + 0.6vw, 1.563rem); /* ~22-25px */
+  --fs-h3: clamp(1.7rem, 1.3rem + 1.2vw, 1.953rem); /* ~27-31px */
+  --fs-h2: clamp(2rem, 1.5rem + 2.5vw, 2.441rem); /* ~32-39px */
+  --fs-h1: clamp(2.5rem, 1.8rem + 4vw, 3.052rem); /* ~40-49px */
+  --fs-display: clamp(3rem, 2rem + 6vw, 4.768rem); /* ~48-76px */
+
+  /* Line height. Light-on-dark adds ~0.05-0.1 per brand.md typography. */
+  --lh-tight: 1.1; /* display + h1 */
+  --lh-heading: 1.2; /* h2 / h3 / subhead */
+  --lh-body: 1.65; /* body, lifted for dark mode */
+  --lh-caption: 1.5;
+
+  /* Letter spacing — restrained. Display tighter, caption slightly open. */
+  --ls-display: -0.02em;
+  --ls-heading: -0.01em;
+  --ls-body: 0;
+  --ls-caption: 0.02em;
+  --ls-meta-allcaps: 0.08em; /* used ONCE, on the photographer-stamp meta — not as section grammar */
+
+  /* Measure — body line length floor */
+  --measure: 68ch; /* sweet spot inside the 65-75ch impeccable law */
+  --measure-tight: 52ch; /* pull quotes */
+  --measure-wide: 84ch; /* h1/h2 only */
+
+  /* === SPACING — vary-by-context, NOT a uniform 4/8/16/32 grid === */
+  /* Same padding everywhere is monotony (impeccable layout law). */
+
+  --space-hairline: 0.125rem; /* 2px */
+  --space-tight: 0.375rem; /* 6px */
+  --space-snug: 0.625rem; /* 10px */
+  --space-base: 1rem; /* 16px */
+  --space-loose: 1.625rem; /* 26px — Fibonacci-ish, NOT 24 */
+  --space-roomy: 2.625rem; /* 42px — NOT 40, intentional offset */
+  --space-spacious: 4.25rem; /* 68px */
+  --space-vast: 6.875rem; /* 110px — section breaks */
+
+  /* Container constraints. Most things should NOT be wrapped in a container. */
+  --container-text: 68ch; /* case-study body column */
+  --container-wide: 78rem; /* studio composition + tables */
+  --container-edge: 1.25rem; /* gutter on small viewports */
+
+  /* === MOTION — at most 3 cubic-beziers === */
+  --ease-focus-pull: cubic-bezier(0.22, 1, 0.36, 1); /* ease-out-quint — focus pull, hover, color shifts */
+  --ease-shutter: cubic-bezier(0.16, 1, 0.3, 1); /* ease-out-expo — navigation, modals, page reveals */
+  --ease-illuminate: cubic-bezier(0.25, 1, 0.5, 1); /* ease-out-quart — bulb illumination, slow atmosphere */
+
+  --dur-instant: 90ms; /* hover color shift, focus ring */
+  --dur-quick: 180ms; /* focus-pull, button states */
+  --dur-considered: 320ms; /* nav transitions, exposure shift */
+  --dur-cinematic: 520ms; /* illumination, page entrance */
+}
+
+/* Reduced-motion: instant transitions, kill atmospheric effects.
+   Vestibular safety + WCAG 2.3.3 per .claude/rules/accessibility.md. */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --dur-instant: 0.01ms;
+    --dur-quick: 0.01ms;
+    --dur-considered: 0.01ms;
+    --dur-cinematic: 0.01ms;
+    --grain-opacity: 0;
+    --dof-blur: 0;
+  }
+}

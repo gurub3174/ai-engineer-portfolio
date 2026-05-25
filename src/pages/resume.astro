@@ -1,0 +1,296 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import { existsSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
+
+/*
+ * Resume — dedicated route, not a modal.
+ *
+ * Rationale: design-system.md bans "modal as first thought."
+ * A dedicated route gives us:
+ *   - deep-linkable URL (/resume)
+ *   - native browser back-button = "x out" (no focus-trap to manage)
+ *   - zero hydrated JS (no overlay state machine)
+ *   - graceful no-PDF fallback at build time
+ *
+ * To enable the PDF preview + download, drop the actual resume file at
+ * public/resume.pdf. The build below detects its presence at compile time
+ * and renders either the embed + download CTA, or a "coming soon" notice.
+ */
+
+const resumeFsPath = fileURLToPath(new URL('../../public/resume.pdf', import.meta.url));
+const hasResume = existsSync(resumeFsPath);
+---
+
+<BaseLayout
+  title="Resume · AI/data engineer"
+  description="One-page resume for an AI/data engineer with a photographer's eye. Available as a PDF download."
+>
+  <header class="meta-bar">
+    <p class="stamp">Portfolio · Resume · 2026</p>
+  </header>
+
+  <main class="resume">
+    <section class="resume-head" aria-labelledby="resume-title">
+      <h1 id="resume-title" class="title">Resume</h1>
+      <p class="subhead">
+        The short version, in one page. The longer version is in the work itself.
+      </p>
+
+      <ul class="cta-row" role="list">
+        {hasResume && (
+          <li>
+            <a class="cta cta--primary" href="/resume.pdf" download>
+              Download PDF
+            </a>
+          </li>
+        )}
+        <li>
+          <a class="cta cta--quiet" href="/#studio">
+            Back to projects
+          </a>
+        </li>
+      </ul>
+    </section>
+
+    {hasResume ? (
+      <section class="preview" aria-label="Resume PDF preview">
+        <object data="/resume.pdf" type="application/pdf" class="frame">
+          <p class="fallback">
+            Your browser can't show the PDF inline.
+            <a href="/resume.pdf" download>Download it instead</a>.
+          </p>
+        </object>
+      </section>
+    ) : (
+      <section class="placeholder" aria-label="Resume placeholder">
+        <p class="placeholder-text">
+          Resume PDF will be live before launch. Until then, the case studies
+          under each project are the better read anyway.
+        </p>
+        <p class="placeholder-meta">
+          Drop a file at <code>public/resume.pdf</code> to enable the download
+          and inline preview on this page.
+        </p>
+      </section>
+    )}
+  </main>
+
+  <footer class="page-footer">
+    <ul class="footer-links" role="list">
+      <li><a href="/">Home</a></li>
+      <li><a href="/about">About</a></li>
+      <li><a href="/contact">Contact</a></li>
+      <li><a href="https://github.com/" rel="me noreferrer">GitHub</a></li>
+      <li><a href="https://www.linkedin.com/" rel="me noreferrer">LinkedIn</a></li>
+    </ul>
+    <p class="footer-meta">Astro · Cloudflare Pages · open source · 2026</p>
+  </footer>
+</BaseLayout>
+
+<style>
+  .meta-bar,
+  .resume,
+  .page-footer {
+    width: 100%;
+    max-width: var(--container-wide);
+    margin-inline: auto;
+    padding-inline: var(--container-edge);
+  }
+
+  .meta-bar {
+    padding-top: var(--space-roomy);
+    padding-bottom: var(--space-base);
+  }
+
+  .stamp {
+    font-family: var(--font-mono);
+    font-size: var(--fs-caption);
+    color: var(--ink-faint);
+    letter-spacing: var(--ls-meta-allcaps);
+    text-transform: uppercase;
+    margin: 0;
+  }
+
+  .resume {
+    padding-top: var(--space-spacious);
+    padding-bottom: var(--space-roomy);
+  }
+
+  .resume-head {
+    margin-bottom: var(--space-loose);
+  }
+
+  .title {
+    font-family: var(--font-display);
+    font-size: var(--fs-display);
+    font-weight: 600;
+    line-height: 0.98;
+    letter-spacing: var(--ls-display);
+    color: var(--ink-strong);
+    margin: 0;
+  }
+
+  .subhead {
+    margin: var(--space-base) 0 0;
+    max-width: 60ch;
+    color: var(--ink-muted);
+    font-family: var(--font-body);
+    font-size: var(--fs-body-lg);
+    line-height: 1.55;
+  }
+
+  .cta-row {
+    list-style: none;
+    margin: var(--space-loose) 0 0;
+    padding: 0;
+    display: flex;
+    gap: var(--space-loose);
+    flex-wrap: wrap;
+  }
+
+  .cta {
+    font-family: var(--font-body);
+    font-size: var(--fs-body);
+    font-weight: 500;
+    color: var(--key-light);
+    text-decoration: none;
+    padding-bottom: 2px;
+    border-bottom: 1px solid currentColor;
+    transition:
+      color var(--dur-quick) var(--ease-focus-pull),
+      border-color var(--dur-quick) var(--ease-focus-pull);
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .cta::after {
+    content: ' →';
+    white-space: nowrap;
+    margin-left: 0.2ch;
+    transition: transform var(--dur-quick) var(--ease-focus-pull);
+    display: inline-block;
+  }
+
+  .cta:hover,
+  .cta:focus-visible {
+    color: var(--ink-strong);
+    border-color: var(--ink-strong);
+  }
+
+  .cta:hover::after,
+  .cta:focus-visible::after {
+    transform: translateX(3px);
+  }
+
+  .cta:focus-visible {
+    outline: 2px solid var(--key-light);
+    outline-offset: 6px;
+    border-color: transparent;
+  }
+
+  .cta--quiet {
+    color: var(--ink-muted);
+  }
+
+  .preview {
+    border: 1px solid var(--border-hairline);
+    border-radius: 4px;
+    overflow: hidden;
+    background: var(--surface-raised);
+    aspect-ratio: 8.5 / 11;
+    max-height: 80vh;
+  }
+
+  .frame {
+    width: 100%;
+    height: 100%;
+    display: block;
+    border: 0;
+  }
+
+  .fallback {
+    padding: var(--space-roomy);
+    text-align: center;
+    color: var(--ink);
+  }
+
+  .fallback a {
+    color: var(--key-light);
+  }
+
+  .placeholder {
+    border: 1px dashed var(--border-hairline);
+    border-radius: 4px;
+    padding: var(--space-spacious);
+    text-align: center;
+    background: var(--surface-raised);
+  }
+
+  .placeholder-text {
+    margin: 0;
+    color: var(--ink);
+    font-size: var(--fs-body-lg);
+    max-width: 50ch;
+    margin-inline: auto;
+    line-height: 1.5;
+  }
+
+  .placeholder-meta {
+    margin: var(--space-base) 0 0;
+    color: var(--ink-faint);
+    font-family: var(--font-mono);
+    font-size: var(--fs-caption);
+  }
+
+  .placeholder-meta code {
+    color: var(--key-light);
+    font-family: var(--font-mono);
+  }
+
+  .page-footer {
+    padding-top: var(--space-spacious);
+    padding-bottom: var(--space-roomy);
+    border-top: 1px solid var(--border-hairline);
+    margin-top: var(--space-roomy);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-base);
+    text-align: center;
+  }
+
+  .footer-links {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--space-loose);
+  }
+
+  .footer-links a {
+    font-family: var(--font-body);
+    font-size: var(--fs-small);
+  }
+
+  .footer-meta {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: var(--fs-caption);
+    color: var(--ink-faint);
+    letter-spacing: 0.02em;
+  }
+
+  @media (max-width: 640px) {
+    .footer-links {
+      gap: var(--space-base);
+    }
+
+    .preview {
+      max-height: none;
+    }
+  }
+</style>

@@ -1,0 +1,687 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+
+/*
+ * Phase 1 design-system reference page.
+ * Internal-only — noindex meta, deleted from main before Phase 2 closes (per docs/phase-1-handoff.md).
+ * Demonstrates every locked decision: typography ramp, color tokens in context,
+ * motion samples, spacing rhythm, photographic atmosphere.
+ */
+
+const subjects = [
+  {
+    id: 'microphone',
+    label: 'Microphone',
+    role: 'Podcast — audio extraction',
+    frame: 'PLATE 01',
+  },
+  {
+    id: 'printer',
+    label: 'Printer',
+    role: 'Doc extractor — PDF tabling',
+    frame: 'PLATE 02',
+  },
+  {
+    id: 'lightbulb',
+    label: 'Lightbulb',
+    role: 'AI design team — orchestration',
+    frame: 'PLATE 03',
+  },
+];
+
+const motionDemos = [
+  { name: 'focus-pull', easing: 'var(--ease-focus-pull)', duration: 'var(--dur-quick)' },
+  { name: 'shutter', easing: 'var(--ease-shutter)', duration: 'var(--dur-considered)' },
+  { name: 'illuminate', easing: 'var(--ease-illuminate)', duration: 'var(--dur-cinematic)' },
+];
+---
+
+<BaseLayout
+  title="Design Reference — internal"
+  description="Phase 1 design-system lock. Internal-only scaffold; not for production."
+  noindex={true}
+>
+  <a href="#sec-composition" class="skip-link">Skip to content</a>
+
+  <header class="page-header">
+    <p class="stamp">DESIGN REFERENCE · PLATE 00 · LOCKED 2026-05-23</p>
+    <h1 class="display">A studio of warm light, made by hand.</h1>
+    <p class="lede">
+      The design system, photographed once. Type, color, motion, and rhythm sit
+      under the same key light. If the photographer-engineer differentiator
+      doesn&apos;t land in two seconds, this reference has failed and the lock
+      goes back open.
+    </p>
+  </header>
+
+  <main>
+
+  <!-- ============================================================ -->
+  <!-- 01 — Hero composition: three lit subjects                    -->
+  <!-- ============================================================ -->
+  <section class="section" aria-labelledby="sec-composition">
+    <p class="kicker">01 / Composition</p>
+    <h2 id="sec-composition">Three subjects on the same desk plane.</h2>
+    <p>
+      Placeholder geometry until real photo composites land in Phase 2. The
+      lighting math, the focus relationship, and the contact-sheet framing are
+      what matter here.
+    </p>
+
+    <div class="studio">
+      {subjects.map((s, i) => (
+        <figure class={`subject subject--${s.id} ${i === 0 ? 'is-focused' : 'is-blurred'}`}>
+          <div class="plinth" aria-hidden="true">
+            <div class="object"></div>
+            <div class="cast-shadow"></div>
+          </div>
+          <figcaption>
+            <span class="frame-number">{s.frame}</span>
+            <span class="subject-label">{s.label}</span>
+            <span class="subject-role">{s.role}</span>
+          </figcaption>
+        </figure>
+      ))}
+    </div>
+
+    <p class="caption">
+      Subject 01 sharp · subjects 02 and 03 defocused via <code>backdrop-filter</code>.
+      Focus pull on hover demonstrates <code>--ease-focus-pull</code> at <code>--dur-quick</code>.
+    </p>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- 02 — Typography ramp                                         -->
+  <!-- ============================================================ -->
+  <section class="section" aria-labelledby="sec-typography">
+    <p class="kicker">02 / Typography</p>
+    <h2 id="sec-typography">One serif, one sans, one mono.</h2>
+    <div class="type-ramp">
+      <div class="ramp-row">
+        <code class="ramp-token">--fs-display · 600</code>
+        <p class="display ramp-sample">A studio of warm light.</p>
+      </div>
+      <div class="ramp-row">
+        <code class="ramp-token">--fs-h1 · 600</code>
+        <h1 class="ramp-sample">What the work was for.</h1>
+      </div>
+      <div class="ramp-row">
+        <code class="ramp-token">--fs-h2 · 600</code>
+        <h2 class="ramp-sample">What didn&apos;t work, first.</h2>
+      </div>
+      <div class="ramp-row">
+        <code class="ramp-token">--fs-h3 · 600</code>
+        <h3 class="ramp-sample">Approach &amp; tradeoffs</h3>
+      </div>
+      <div class="ramp-row">
+        <code class="ramp-token">--fs-body-lg · 400</code>
+        <p class="lede ramp-sample">
+          A lede paragraph in Geist Sans, twenty pixels, slightly tighter
+          line height than body so it reads as set apart.
+        </p>
+      </div>
+      <div class="ramp-row">
+        <code class="ramp-token">--fs-body · 400</code>
+        <p class="ramp-sample">
+          Body copy in Geist Sans, sixteen pixels, sixty-eight characters wide.
+          Light text on dark adds 0.05 to the line height; this paragraph runs
+          at 1.65 to compensate for the perceived weight loss against the cove.
+        </p>
+      </div>
+      <div class="ramp-row">
+        <code class="ramp-token">--fs-small · mono</code>
+        <p class="ramp-sample"><code>pnpm install &amp;&amp; pnpm dev</code></p>
+      </div>
+      <div class="ramp-row">
+        <code class="ramp-token">--fs-caption</code>
+        <small class="ramp-sample">Plate 02 · printed 2026-05-23 · stamped by hand.</small>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- 03 — Color tokens in context                                 -->
+  <!-- ============================================================ -->
+  <section class="section" aria-labelledby="sec-color">
+    <p class="kicker">03 / Color</p>
+    <h2 id="sec-color">Warm tungsten carries the identity.</h2>
+    <p>
+      OKLCH only. Every neutral tinted toward 65deg (warm amber), chroma 0.005
+      to 0.16 across the lightness scale. Contrast verified WCAG AAA for body
+      text on the cove.
+    </p>
+
+    <div class="swatches">
+      <div class="swatch" style="background: var(--bg-stage);">
+        <code>--bg-stage</code>
+        <span>oklch(0.13 0.008 65)</span>
+      </div>
+      <div class="swatch" style="background: var(--surface);">
+        <code>--surface</code>
+        <span>oklch(0.17 0.012 65)</span>
+      </div>
+      <div class="swatch" style="background: var(--surface-raised);">
+        <code>--surface-raised</code>
+        <span>oklch(0.21 0.014 65)</span>
+      </div>
+      <div class="swatch" style="background: var(--key-light); color: var(--bg-stage);">
+        <code>--key-light</code>
+        <span>oklch(0.74 0.155 65)</span>
+      </div>
+      <div class="swatch" style="background: var(--rim-light); color: var(--bg-stage);">
+        <code>--rim-light</code>
+        <span>oklch(0.82 0.085 78)</span>
+      </div>
+      <div class="swatch" style="background: var(--surface); color: var(--ink-faint);">
+        <code>--ink-faint</code>
+        <span>oklch(0.68 0.014 65)</span>
+      </div>
+    </div>
+
+    <p class="caption">
+      Hover any swatch to see the focus-pull easing on the border tint.
+    </p>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- 04 — Case-study section anatomy                              -->
+  <!-- ============================================================ -->
+  <section class="section section--column" aria-labelledby="sec-case-study">
+    <p class="kicker">04 / Case-study anatomy</p>
+    <h2 id="sec-case-study">Problem · Approach · What didn&apos;t work · Outcomes.</h2>
+    <p>
+      Four sections, every project. The third is highest-signal per market
+      research, so it gets the strongest setting on the page: pulled out into
+      the wider measure, marked with the rim light.
+    </p>
+
+    <article class="case-study">
+      <h3>Problem</h3>
+      <p>
+        PE limited partners receive monthly capital-call notices in inconsistent
+        PDF layouts across 20+ GPs. Extraction by hand takes 6+ hours per cycle
+        and introduces about 5% line-item error. The team wanted to cut this to
+        under one hour with under 1% error, on commodity hardware.
+      </p>
+
+      <h3>Approach</h3>
+      <p>
+        Chose a hybrid rules + LLM approach over pure LLM extraction. Rules
+        handle the predictable header/footer regions deterministically. The
+        LLM handles only the variable-format middle section, with structured
+        output validation. This trades implementation complexity for cost (~10x
+        cheaper) and reliability (fabrication risk isolated to one path).
+      </p>
+
+      <h3 class="what-didnt-work">What didn&apos;t work</h3>
+      <div class="rim-callout">
+        <p>
+          Initial spike used semantic chunking + RAG retrieval over the full
+          document. Worked great on training docs, failed on production where
+          the layout assumption broke. Spent about two weeks chasing this
+          before realizing the entire chunking step was solving the wrong
+          problem: the documents are structured enough that layout-aware
+          extraction beats semantic retrieval. Killed the RAG path, rebuilt
+          extraction around layout regions. Lost about ten days but the
+          rebuild was the right answer.
+        </p>
+      </div>
+
+      <h3>Outcomes</h3>
+      <p>
+        Cut per-document extraction from 6 hours manual to 12 minutes
+        automated, with 0.4% line-item error on production data (target was
+        under 1%). Saved an estimated 80 hours/month across the LP team.
+        Biggest learning: structured-output validation is load-bearing.
+        Without it the LLM path silently fabricates about 3% of the time.
+      </p>
+    </article>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- 05 — Motion samples                                          -->
+  <!-- ============================================================ -->
+  <section class="section" aria-labelledby="sec-motion">
+    <p class="kicker">05 / Motion</p>
+    <h2 id="sec-motion">Three easing curves. No bounce. No elastic.</h2>
+    <p>
+      Hover or focus each tile to play the curve. Under
+      <code>prefers-reduced-motion: reduce</code>, all four durations collapse
+      to <code>0.01ms</code> via the token override.
+    </p>
+    <div class="motion-grid">
+      {motionDemos.map((m) => (
+        <button
+          type="button"
+          class={`motion-tile motion-tile--${m.name}`}
+          style={`--demo-ease: ${m.easing}; --demo-dur: ${m.duration};`}
+        >
+          <span class="motion-label">{m.name}</span>
+          <span class="motion-meta">{m.duration} · {m.easing}</span>
+          <span class="motion-bar" aria-hidden="true"></span>
+        </button>
+      ))}
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- 06 — Spacing rhythm                                          -->
+  <!-- ============================================================ -->
+  <section class="section" aria-labelledby="sec-spacing">
+    <p class="kicker">06 / Rhythm</p>
+    <h2 id="sec-spacing">Spacing varies on purpose.</h2>
+    <p>
+      Same padding everywhere is monotony. The scale steps at uneven intervals:
+      6 / 10 / 16 / 26 / 42 / 68 / 110 px. Most things should not be wrapped in
+      a container.
+    </p>
+    <div class="rhythm">
+      <span style="width: var(--space-tight)"></span>
+      <span style="width: var(--space-snug)"></span>
+      <span style="width: var(--space-base)"></span>
+      <span style="width: var(--space-loose)"></span>
+      <span style="width: var(--space-roomy)"></span>
+      <span style="width: var(--space-spacious)"></span>
+      <span style="width: var(--space-vast)"></span>
+    </div>
+  </section>
+
+  </main>
+
+  <footer class="page-footer">
+    <p class="caption">
+      Reference page · throwaway scaffold · deleted from main before Phase 2.
+      Coherence gates and decision log: <code>docs/design-decisions.md</code>.
+    </p>
+  </footer>
+</BaseLayout>
+
+<style>
+  /* Skip-link — first focusable child of body. Visually hidden until focused. */
+  .skip-link {
+    position: absolute;
+    left: var(--container-edge);
+    top: var(--container-edge);
+    padding: var(--space-snug) var(--space-base);
+    background: var(--surface-raised);
+    color: var(--key-light);
+    border: 1px solid var(--border-key);
+    border-radius: 2px;
+    z-index: 200;
+    transform: translateY(-200%);
+    transition: transform var(--dur-quick) var(--ease-focus-pull);
+  }
+
+  .skip-link:focus-visible {
+    transform: translateY(0);
+  }
+
+  /* Layout shell. Single column, generous vertical rhythm, edge gutter. */
+  .page-header,
+  .section,
+  .page-footer {
+    width: 100%;
+    max-width: var(--container-wide);
+    margin: 0 auto;
+    padding: var(--space-spacious) var(--container-edge);
+  }
+
+  .page-header {
+    padding-top: var(--space-vast);
+    padding-bottom: var(--space-spacious);
+    border-bottom: 1px solid var(--border-hairline);
+  }
+
+  .section {
+    padding-top: var(--space-spacious);
+    padding-bottom: var(--space-spacious);
+    border-bottom: 1px solid var(--border-hairline);
+  }
+
+  .section--column {
+    max-width: 56rem;
+  }
+
+  .page-footer {
+    padding-top: var(--space-roomy);
+    padding-bottom: var(--space-vast);
+    text-align: center;
+  }
+
+  /* Stamp + kicker — set ONCE on the page-level meta, NOT as section grammar.
+     Avoids the "repeated tiny uppercase tracked labels" brand-ban (impeccable). */
+  .stamp {
+    font-family: var(--font-mono);
+    font-size: var(--fs-caption);
+    color: var(--ink-faint);
+    letter-spacing: var(--ls-meta-allcaps);
+    text-transform: uppercase;
+    margin: 0 0 var(--space-loose) 0;
+  }
+
+  .kicker {
+    font-family: var(--font-mono);
+    font-size: var(--fs-caption);
+    color: var(--ink-faint);
+    margin: 0 0 var(--space-snug) 0;
+    /* lowercase, NOT tracked-uppercase — escapes the editorial-typographic kicker grammar */
+  }
+
+  .display {
+    font-family: var(--font-display);
+    font-size: var(--fs-display);
+    line-height: var(--lh-tight);
+    letter-spacing: var(--ls-display);
+    color: var(--ink-strong);
+    max-width: 20ch;
+    margin: 0 0 var(--space-loose) 0;
+    font-weight: 600;
+    text-wrap: balance;
+  }
+
+  /* Studio composition — three plinths on the desk plane */
+  .studio {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--space-loose);
+    margin: var(--space-roomy) 0;
+    padding: var(--space-roomy) var(--space-loose);
+    background:
+      radial-gradient(
+        ellipse 80% 70% at 50% 30%,
+        oklch(0.74 0.155 65 / 0.12) 0%,
+        transparent 60%
+      ),
+      linear-gradient(180deg, var(--surface) 0%, var(--surface-sunken) 100%);
+    border: 1px solid var(--border-hairline);
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Rim light streak from upper right */
+  .studio::before {
+    content: '';
+    position: absolute;
+    top: -20%;
+    right: -10%;
+    width: 70%;
+    height: 60%;
+    background: radial-gradient(
+      ellipse at top right,
+      oklch(0.82 0.085 78 / 0.18) 0%,
+      transparent 65%
+    );
+    pointer-events: none;
+  }
+
+  .subject {
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: filter var(--dur-quick) var(--ease-focus-pull),
+                transform var(--dur-quick) var(--ease-focus-pull);
+  }
+
+  .subject.is-blurred {
+    filter: blur(var(--dof-blur)) brightness(0.85);
+    transform: scale(0.96);
+  }
+
+  .studio:hover .subject.is-blurred,
+  .studio:focus-within .subject.is-blurred {
+    filter: blur(calc(var(--dof-blur) * 0.3)) brightness(0.95);
+  }
+
+  .plinth {
+    width: 100%;
+    aspect-ratio: 3 / 4;
+    position: relative;
+    display: grid;
+    place-items: end center;
+  }
+
+  .object {
+    width: 55%;
+    height: 70%;
+    background: linear-gradient(
+      135deg,
+      oklch(0.42 0.025 65) 0%,
+      oklch(0.28 0.018 65) 100%
+    );
+    border-radius: 4px 4px 2px 2px;
+    box-shadow:
+      /* key light from upper left */
+      inset 8px 8px 18px oklch(0.74 0.155 65 / 0.22),
+      /* rim light from upper right */
+      inset -3px -2px 14px oklch(0.82 0.085 78 / 0.12);
+    position: relative;
+  }
+
+  .cast-shadow {
+    position: absolute;
+    left: 22%;
+    right: 22%;
+    bottom: 8%;
+    height: 6px;
+    background: radial-gradient(ellipse at center, oklch(0.05 0 0 / 0.7), transparent 70%);
+    filter: blur(3px);
+  }
+
+  figcaption {
+    margin-top: var(--space-base);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-hairline);
+    text-align: center;
+  }
+
+  .frame-number {
+    font-family: var(--font-mono);
+    font-size: var(--fs-caption);
+    color: var(--ink-faint);
+    letter-spacing: var(--ls-meta-allcaps);
+  }
+
+  .subject-label {
+    font-family: var(--font-display);
+    font-size: var(--fs-subhead);
+    color: var(--ink-strong);
+    font-weight: 600;
+  }
+
+  .subject-role {
+    font-family: var(--font-body);
+    font-size: var(--fs-small);
+    color: var(--ink-muted);
+  }
+
+  /* Typography ramp */
+  .type-ramp {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-loose);
+    margin-top: var(--space-roomy);
+  }
+
+  .ramp-row {
+    display: grid;
+    grid-template-columns: minmax(180px, 220px) 1fr;
+    gap: var(--space-loose);
+    align-items: baseline;
+    padding-bottom: var(--space-base);
+    border-bottom: 1px dashed var(--border-hairline);
+  }
+
+  .ramp-token {
+    font-size: var(--fs-caption);
+    color: var(--ink-faint);
+  }
+
+  .ramp-sample {
+    margin: 0;
+    color: var(--ink-strong);
+  }
+
+  /* Color swatches */
+  .swatches {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: var(--space-snug);
+    margin: var(--space-roomy) 0 var(--space-base);
+  }
+
+  .swatch {
+    padding: var(--space-roomy) var(--space-base) var(--space-base);
+    border: 1px solid var(--border-hairline);
+    border-radius: 2px;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-hairline);
+    min-height: 9rem;
+    justify-content: flex-end;
+    transition: border-color var(--dur-quick) var(--ease-focus-pull);
+    color: var(--ink);
+  }
+
+  .swatch:hover {
+    border-color: var(--border-key);
+  }
+
+  .swatch code {
+    font-size: var(--fs-small);
+    color: inherit;
+  }
+
+  .swatch span {
+    font-family: var(--font-mono);
+    font-size: var(--fs-caption);
+    color: inherit;
+  }
+
+  /* Case study composition */
+  .case-study {
+    margin-top: var(--space-roomy);
+  }
+
+  .case-study h3 {
+    margin-top: var(--space-loose);
+    margin-bottom: var(--space-snug);
+  }
+
+  .case-study h3.what-didnt-work {
+    color: var(--rim-light);
+  }
+
+  .rim-callout {
+    padding: var(--space-base) var(--space-loose);
+    background: oklch(0.82 0.085 78 / 0.05);
+    border: 1px solid var(--border-hairline);
+    border-radius: 2px;
+    /* full-perimeter hairline, NOT side-stripe — escapes the side-stripe ban */
+    margin: var(--space-snug) 0 var(--space-loose);
+  }
+
+  /* Motion grid */
+  .motion-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: var(--space-base);
+    margin-top: var(--space-roomy);
+  }
+
+  .motion-tile {
+    background: var(--surface-raised);
+    border: 1px solid var(--border-hairline);
+    color: var(--ink);
+    padding: var(--space-loose);
+    border-radius: 2px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-snug);
+    min-height: 44px;
+    text-align: left;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .motion-tile:hover,
+  .motion-tile:focus-visible {
+    border-color: var(--border-key);
+  }
+
+  .motion-label {
+    font-family: var(--font-mono);
+    font-size: var(--fs-small);
+    color: var(--key-light-soft);
+  }
+
+  .motion-meta {
+    font-family: var(--font-mono);
+    font-size: var(--fs-caption);
+    color: var(--ink-muted);
+  }
+
+  .motion-bar {
+    display: block;
+    width: 100%;
+    height: 4px;
+    margin-top: var(--space-snug);
+    background: linear-gradient(90deg, var(--key-light) 0%, var(--rim-light) 100%);
+    transform: scaleX(0);
+    transform-origin: left center;
+    transition: transform var(--demo-dur, var(--dur-considered)) var(--demo-ease, var(--ease-focus-pull));
+  }
+
+  .motion-tile:hover .motion-bar,
+  .motion-tile:focus-visible .motion-bar {
+    transform: scaleX(1);
+  }
+
+  /* Spacing rhythm visualization */
+  .rhythm {
+    display: flex;
+    align-items: flex-end;
+    gap: var(--space-snug);
+    margin-top: var(--space-roomy);
+    padding: var(--space-base);
+    background: var(--surface);
+    border: 1px solid var(--border-hairline);
+    border-radius: 2px;
+    height: 8rem;
+  }
+
+  .rhythm span {
+    display: block;
+    height: 100%;
+    background: var(--key-light);
+    opacity: 0.85;
+    border-radius: 1px 1px 0 0;
+  }
+
+  /* Responsive: collapse studio to one focused + two on a strip */
+  @media (max-width: 640px) {
+    .studio {
+      grid-template-columns: 1fr;
+      grid-template-areas:
+        'focus'
+        'strip';
+      gap: var(--space-base);
+    }
+    .subject.is-focused {
+      grid-area: focus;
+    }
+    .subject.is-blurred {
+      grid-area: strip;
+      display: none; /* on mobile, only show the focused subject; strip lands Phase 2 */
+    }
+    .ramp-row {
+      grid-template-columns: 1fr;
+      gap: var(--space-snug);
+    }
+    .display {
+      max-width: none;
+    }
+  }
+</style>
