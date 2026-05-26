@@ -13,8 +13,8 @@
     "lint:fix": "biome check --apply .",
     "format": "biome format --write .",
     "a11y": "node ./scripts/a11y.mjs",
-    "lh:desktop": "lhci autorun --config=./lighthouserc.json",
-    "lh:mobile": "lhci autorun --config=./lighthouserc.mobile.json",
+    "lh:desktop": "node ./scripts/run-lh.mjs desktop",
+    "lh:mobile": "node ./scripts/run-lh.mjs mobile",
     "lh": "pnpm lh:desktop && pnpm lh:mobile",
     "new-project": "node ./scripts/new-project.mjs",
     "install-fonts": "node ./scripts/install-fonts.mjs"

@@ -24,6 +24,7 @@ CLAUDE.local.md
 # OS
 .DS_Store
 Thumbs.db
+desktop.ini
 
 # IDE
 .vscode/
@@ -37,6 +38,7 @@ pnpm-debug.log*
 
 # Lighthouse CI
 .lighthouseci/
+.lh-tmp/
 
 # Asset working files (raw renders, source PSDs)
 /src/assets/_raw/

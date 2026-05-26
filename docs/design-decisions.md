@@ -522,6 +522,33 @@ Only architecture amendment still queued for user sign-off: §4.1 equal-weight �
 
 ---
 
+## 12. Home v11 — wide background + 4-up risks (2026-05-25)
+
+**Decision:** swap home background to `home-bg-wide.png` (wide composition: softbox left-of-center, table right). Promote scene to full-bleed. Move site header inside the scene as an overlay (identity top-left in uppercase mono, nav top-right). Re-anchor product cutouts to the right-side table. Collapse the 2x2 risk grid to a 4-up editorial row with mono "Failure pattern / Design response" micro-labels.
+
+**Why:** the v10 hero still framed the studio as a portrait inside a container, leaving the identity row in plain serif above it. That reads as "editorial-dark-serif portfolio" (second-order AI-slop trap per PRODUCT.md anti-references). A full-bleed photographic stage with overlaid uppercase-mono wordmark separates the photographer-engineer identity from the Substack-marketing-page aesthetic family in <2 seconds (PRODUCT.md strategic principle #2). The 4-up risks row matches the user-supplied reference image and tightens the "I focus on the layers that make AI systems reliable" thesis into one read.
+
+**Why not 2x2 risks:** the 2x2 grid encouraged longer technique strings and a thumbnail per plate; visually it landed as "feature grid with photo frames." Four shorter plates side-by-side reads as a typography-led editorial row and frees vertical space for the hero photograph.
+
+**What earned each plate distinct identity without breaking the palette:** numeral accent rotates across already-locked tokens — `--key-light` (plate 01), `--key-light-soft` (plate 02), `--rim-light` (plate 03), `--key-light` (plate 04). No new colors introduced; cycles inside the warm-tungsten Committed strategy.
+
+**Impeccable critique (manual fallback — `detect.mjs` bundle missing in this skill copy):**
+- 0 hard anti-pattern blockers (no hex / side-stripes / gradient text / glassmorphism / hero-metric / nested cards / banned fonts / bounce-easing / backdrop-filter abuse)
+- 2x P1 fixed in same turn: em dash in `aria-label` removed; risks heading hierarchy inverted vs. reference, swapped
+- 2x P2 applied: hairline divider above "Design response" label restored on each plate; per-plate numeral accent rotation (above)
+- 1x P2 declined: top-nav contrast guard (defensive only; bg dark at top — re-evaluate if a future bg swap brightens the top edge)
+
+**Token discipline impact:** still inside coherence gates §3.8.
+- 1 inline OKLCH literal added (`oklch(0.18 0.012 65)` as text color on solid `--key-light` button, line 553) — scoped contrast override; not a parallel system.
+- 1 inline OKLCH literal added (`oklch(0.11 0.008 65 / 0.6)` as risk-plate background) — one-off surface tint distinct from `--surface` for the over-photograph context.
+- Both could be promoted to tokens if reused; right now they're scoped to this file.
+
+**Perf envelope:** new bg AVIF 36 KB largest variant (1408 KB → 36 KB). Home page weight still inside ≤200 KB target. `pnpm check` and `pnpm build` clean post-rewrite. `pnpm a11y` + Lighthouse not re-validated this session — gated on user eye-check of product alignment before re-baseline.
+
+**Evidence anchor:** `src/pages/index.astro` (v11), `src/assets/home-bg-wide.png`, `docs/background wide.png` (source).
+
+---
+
 ## Related
 
 - `PRODUCT.md` — brand context this design serves

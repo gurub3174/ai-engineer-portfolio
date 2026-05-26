@@ -1,24 +1,26 @@
 ---
 import BaseLayout from '@layouts/BaseLayout.astro';
 import { Picture } from 'astro:assets';
-import homeBg from '@/assets/home-bg.png';
+import homeBg from '@/assets/home-bg-wide.png';
 import homeBinder from '@/assets/home-binder.png';
 import homeMic from '@/assets/home-mic.png';
 import homeBulb from '@/assets/home-bulb.png';
 
 /*
- * Home — Phase 2 (v9, overlay + risks).
+ * Home — Phase 2 (v11, wide background + 4-up risks).
  *
- * Changes from v8:
- *   - Site header: identity top-left, nav top-right (replaces old stamp meta-bar).
- *   - Title + subhead + CTAs overlaid on the studio image instead of stacked above it.
- *     Adds .scene-tint gradient on the left of the scene to guarantee AA contrast.
- *   - "Data that works." title line italicized for editorial rhythm.
- *   - Subhead widened to ~70ch (was 60ch). Still inside the impeccable 65–75ch readability law.
- *   - Bulb moved up (y 83→80) so it doesn't run off the table edge.
- *   - New section: "Production risks I design around." Four risks rendered as
- *     editorial plates (serif numeral prefix, image placeholder, body, technique
- *     strip). Dodges the "identical card grid" AI-slop ban via numeral framing.
+ * Changes from v10:
+ *   - Background swapped to home-bg-wide.png — wider studio composition with
+ *     softbox left-of-center and the round table on the right.
+ *   - Scene goes fully bleed-to-edge (100vw, no container clamp).
+ *   - Site header floats over the scene: identity top-left, nav top-right,
+ *     no padded shell — visual gutter only via padding-inline on .site-nav.
+ *   - Hero copy block stays on the left third of the scene; widths re-tuned
+ *     so the title clears the softbox in the bg image.
+ *   - Products re-anchored to the right-side table: bulb (left of binder)
+ *     63%, binder hero 76%, mic 90%. Same hover/highlight recipe.
+ *   - "Production risks" grid: 2x2 → 1x4 row, plate proportions adjusted
+ *     so four columns read at desktop widths without crowding.
  *
  * Zero hydrated JS. All interactivity is :has() + CSS transitions.
  */
@@ -30,7 +32,7 @@ const subjects = [
     name: 'Document extractor',
     tip: 'Layout-aware PDF extraction for PE capital-call notices. Hybrid rules + LLM cut a 6-hour manual process to 12 minutes with 0.4% line-item error.',
     role: 'hero',
-    pos: { x: 50, y: 80, w: 28 },
+    pos: { x: 72, y: 76, w: 20 },
     capGap: '-2rem',
   },
   {
@@ -39,7 +41,7 @@ const subjects = [
     name: 'Podcast pipeline',
     tip: 'Audio sampling pipeline. A 90-minute episode condensed into a 6-bullet research brief, validated against the source transcript.',
     role: 'supporting',
-    pos: { x: 74, y: 77, w: 15 },
+    pos: { x: 88, y: 74, w: 10 },
     capGap: '1rem',
   },
   {
@@ -48,7 +50,7 @@ const subjects = [
     name: 'AI design team',
     tip: 'Four agents argue a design brief into a finished spec. The argumentation log itself is the deliverable.',
     role: 'supporting',
-    pos: { x: 29, y: 80, w: 16 },
+    pos: { x: 56, y: 76, w: 11 },
     capGap: '-1rem',
   },
 ];
@@ -58,11 +60,10 @@ const risks = [
     n: '01',
     slug: 'bad-inputs',
     title: 'Bad inputs, bad context',
-    body: 'AI systems fail when the model receives incomplete, excessive, stale, or irrelevant context.',
+    body: 'The model gets incomplete, excessive, stale, or irrelevant context.',
     techniques: [
       'Clean ingestion',
       'metadata design',
-      'chunking strategy',
       'retrieval testing',
       'context filtering',
     ],
@@ -71,24 +72,22 @@ const risks = [
     n: '02',
     slug: 'untrusted-outputs',
     title: 'Untrusted outputs',
-    body: 'A fluent answer is not the same as a reliable answer. Outputs need constraints before they can be used.',
+    body: 'Fluent answers can look correct before they are actually reliable.',
     techniques: [
       'Structured outputs',
       'schema validation',
       'confidence flags',
       'business rules',
-      'deterministic contracts',
     ],
   },
   {
     n: '03',
     slug: 'no-evaluation-loop',
     title: 'No evaluation loop',
-    body: 'Without a formal review process, teams cannot tell whether the system is improving, drifting, or failing.',
+    body: 'Without review, teams cannot measure drift, quality, or failure.',
     techniques: [
       'Eval sets',
       'human review',
-      'editable outputs',
       'approval states',
       'audit trails',
     ],
@@ -97,13 +96,12 @@ const risks = [
     n: '04',
     slug: 'silent-failure',
     title: 'Silent failure',
-    body: 'If no one can see when the system breaks, the system cannot be trusted.',
+    body: 'Systems break quietly unless their behavior is observable.',
     techniques: [
       'Logging',
       'monitoring',
       'exception queues',
       'feedback loops',
-      'production alerts',
     ],
   },
 ];
@@ -126,32 +124,30 @@ const risks = [
           src={homeBg}
           formats={['avif', 'webp']}
           fallbackFormat="jpg"
-          widths={[480, 768, 1024, 1440, 1920, 2560, 3200]}
+          widths={[768, 1280, 1600, 2000, 2400]}
           sizes="100vw"
-          alt="Empty studio scene: a round wooden table lit by a softbox on the left, against a deep warm cove background."
+          alt="Empty studio scene: a round wooden table on the right lit by a softbox on the left, against a deep warm cove background."
           loading="eager"
           fetchpriority="high"
-          quality={78}
+          quality={80}
           pictureAttributes={{ class: 'scene-bg' }}
         />
 
         <div class="scene-tint" aria-hidden="true"></div>
 
         <header class="site-nav">
-          <div class="site-nav-inner">
-            <a class="identity" href="/" aria-label="Guru Balamurugan — home">
-              <span class="identity-name">Guru Balamurugan</span>
-              <span class="identity-sep" aria-hidden="true">·</span>
-              <span class="identity-role">AI Engineer</span>
-            </a>
+          <a class="identity" href="/" aria-label="Guru Balamurugan, home">
+            <span class="identity-name">Guru Balamurugan</span>
+            <span class="identity-sep" aria-hidden="true">·</span>
+            <span class="identity-role">AI Engineer</span>
+          </a>
 
-            <nav class="primary-nav" aria-label="Primary">
-              <a href="#studio">Projects</a>
-              <a href="/resume">Resume</a>
-              <a href="/about">About</a>
-              <a href="/contact">Contact</a>
-            </nav>
-          </div>
+          <nav class="primary-nav" aria-label="Primary">
+            <a href="#risks">Projects</a>
+            <a href="/resume">Resume</a>
+            <a href="/about">About</a>
+            <a href="/contact">Contact</a>
+          </nav>
         </header>
 
         <div class="scene-overlay" aria-labelledby="title">
@@ -161,10 +157,10 @@ const risks = [
           </h1>
 
           <p class="subhead">
-            AI prototypes are easy to impress with and hard to trust. I bring a data
-            engineering foundation to AI engineering, building the data, retrieval,
-            evaluation, and operational layers that turn promising demos into reliable
-            production systems.
+            AI prototypes are easy to impress with and hard to trust. I bring a
+            data engineering foundation to AI engineering, building the retrieval,
+            evaluation, and operational layers that turn promising demos into
+            reliable production systems.
           </p>
 
           <ul class="cta-row" role="list">
@@ -199,7 +195,7 @@ const risks = [
                       formats={['avif', 'webp']}
                       fallbackFormat="png"
                       widths={[200, 320, 480, 640]}
-                      sizes="(min-width: 1280px) 320px, (min-width: 768px) 25vw, 30vw"
+                      sizes="(min-width: 1280px) 320px, (min-width: 768px) 22vw, 28vw"
                       alt=""
                       loading="eager"
                       quality={78}
@@ -211,7 +207,7 @@ const risks = [
                       formats={['avif', 'webp']}
                       fallbackFormat="png"
                       widths={[140, 220, 320]}
-                      sizes="(min-width: 1280px) 140px, (min-width: 768px) 10vw, 14vw"
+                      sizes="(min-width: 1280px) 130px, (min-width: 768px) 9vw, 12vw"
                       alt=""
                       loading="eager"
                       quality={78}
@@ -223,7 +219,7 @@ const risks = [
                       formats={['avif', 'webp']}
                       fallbackFormat="png"
                       widths={[140, 220, 320]}
-                      sizes="(min-width: 1280px) 150px, (min-width: 768px) 11vw, 15vw"
+                      sizes="(min-width: 1280px) 140px, (min-width: 768px) 10vw, 14vw"
                       alt=""
                       loading="eager"
                       quality={78}
@@ -249,38 +245,31 @@ const risks = [
 
     <section id="risks" class="risks" aria-labelledby="risks-title">
       <header class="risks-head">
-        <p class="risks-eyebrow">Selected · risks</p>
         <h2 id="risks-title" class="risks-title">
           Production risks I design around.
         </h2>
-        <p class="risks-deck">
-          The work is organized around what fails in production, not which model is in fashion.
-          Each plate below names a failure mode and the engineering layer that prevents it.
-        </p>
       </header>
 
       <ol class="risk-grid" role="list">
         {risks.map((r) => (
           <li class={`risk risk--${r.slug}`}>
-            <div class="risk-thumb" aria-hidden="true">
-              <span class="risk-thumb-meta">Plate / placeholder</span>
-            </div>
-            <div class="risk-body">
-              <p class="risk-number">
-                <span class="risk-number-numeral">{r.n}</span>
-                <span class="risk-number-slash">/</span>
-              </p>
-              <h3 class="risk-title">{r.title}</h3>
-              <p class="risk-text">{r.body}</p>
-              <p class="risk-techniques">
-                {r.techniques.map((t, i) => (
-                  <>
-                    {i > 0 && <span class="risk-tech-sep" aria-hidden="true"> · </span>}
-                    <span class="risk-tech">{t}</span>
-                  </>
-                ))}
-              </p>
-            </div>
+            <p class="risk-number">
+              <span class="risk-number-numeral">{r.n}</span>
+            </p>
+            <h3 class="risk-title">{r.title}</h3>
+
+            <p class="risk-label">Failure pattern</p>
+            <p class="risk-text">{r.body}</p>
+
+            <p class="risk-label risk-label--response">Design response</p>
+            <p class="risk-techniques">
+              {r.techniques.map((t, i) => (
+                <>
+                  {i > 0 && <span class="risk-tech-sep" aria-hidden="true"> · </span>}
+                  <span class="risk-tech">{t}</span>
+                </>
+              ))}
+            </p>
           </li>
         ))}
       </ol>
@@ -324,8 +313,7 @@ const risks = [
   }
 
   /* ============================================================
-   * Shell — only the content sections below the hero stay constrained.
-   * Studio + site-nav are full-bleed inside the hero scene.
+   * Shell — risks + footer stay inside container; studio is full-bleed.
    * ============================================================ */
   .risks,
   .page-footer {
@@ -336,97 +324,7 @@ const risks = [
   }
 
   /* ============================================================
-   * Site header — overlaid on the studio image (top edge of scene).
-   * Inner wrapper carries the content-width alignment so identity and
-   * primary-nav still line up with the risks / footer sections below.
-   * ============================================================ */
-  .site-nav {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    z-index: 4;
-    padding-block: var(--space-roomy) var(--space-loose);
-    pointer-events: none;
-  }
-
-  .site-nav-inner {
-    max-width: var(--container-wide);
-    margin-inline: auto;
-    padding-inline: var(--container-edge);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: var(--space-loose);
-    flex-wrap: wrap;
-    pointer-events: auto;
-  }
-
-  .identity {
-    display: inline-flex;
-    align-items: baseline;
-    gap: 0.45ch;
-    text-decoration: none;
-    color: inherit;
-    font-family: var(--font-display);
-  }
-
-  .identity-name {
-    font-size: var(--fs-body-lg);
-    font-weight: 600;
-    color: var(--ink-strong);
-    letter-spacing: var(--ls-heading);
-  }
-
-  .identity-sep {
-    color: var(--ink-faint);
-    font-size: var(--fs-body-lg);
-  }
-
-  .identity-role {
-    font-family: var(--font-mono);
-    font-size: var(--fs-caption);
-    color: var(--ink-faint);
-    letter-spacing: var(--ls-meta-allcaps);
-    text-transform: uppercase;
-    align-self: center;
-    margin-left: 0.4ch;
-  }
-
-  .primary-nav {
-    display: flex;
-    gap: var(--space-loose);
-    flex-wrap: wrap;
-  }
-
-  .primary-nav a {
-    font-family: var(--font-body);
-    font-size: var(--fs-small);
-    color: var(--ink-muted);
-    text-decoration: none;
-    padding: var(--space-tight) 0;
-    border-bottom: 1px solid transparent;
-    transition:
-      color var(--dur-quick) var(--ease-focus-pull),
-      border-color var(--dur-quick) var(--ease-focus-pull);
-    min-height: 44px;
-    display: inline-flex;
-    align-items: center;
-  }
-
-  .primary-nav a:hover,
-  .primary-nav a:focus-visible {
-    color: var(--ink-strong);
-    border-bottom-color: var(--key-light);
-  }
-
-  .primary-nav a:focus-visible {
-    outline: 2px solid var(--key-light);
-    outline-offset: 4px;
-  }
-
-  /* ============================================================
-   * Studio scene — full-bleed letterbox hero, no side gutters.
+   * Studio scene — full-bleed hero
    * ============================================================ */
   .studio {
     position: relative;
@@ -439,9 +337,15 @@ const risks = [
   .scene {
     position: relative;
     width: 100%;
-    min-height: 70vh;
-    aspect-ratio: 21 / 9;
+    /* Matches native ratio of src/assets/home-bg-wide.png after the crop
+       script runs. Re-run scripts/crop-home-bg.mjs with a different pixel
+       value and paste the printed ratio here.
+       To shrink the hero further: lower min-height. To grow it: raise. */
+    aspect-ratio: 1832 / 759;
+    min-height: 420px;
+    max-height: 78vh;
     overflow: hidden;
+    border: none;
   }
 
   :global(.scene-bg),
@@ -450,6 +354,7 @@ const risks = [
     height: 100%;
     display: block;
     object-fit: cover;
+    object-position: center;
   }
 
   :global(.scene-bg) {
@@ -463,9 +368,12 @@ const risks = [
       filter var(--dur-considered) var(--ease-illuminate);
   }
 
-  /* Contrast tint — top + left compound gradient. Top layer covers the
-     nav row; left layer covers identity and title. Both fade out toward
-     the products so the photograph stays visible there. */
+  /* Two-layer contrast tint:
+       (1) Top band — protects the nav text on the right side of the scene
+           where the bg has bright softbox illumination. ~120px deep, hard
+           anchor at top, full fade by the time it reaches the hero title.
+       (2) Left wash — original left-to-right gradient that guarantees AA
+           contrast for the overlaid title + subhead. */
   .scene-tint {
     position: absolute;
     inset: 0;
@@ -473,36 +381,117 @@ const risks = [
     pointer-events: none;
     background:
       linear-gradient(
-        180deg,
-        oklch(0.07 0.005 65 / 0.55) 0%,
-        oklch(0.07 0.005 65 / 0.30) 14%,
-        transparent 28%
+        to bottom,
+        oklch(0.05 0.005 65 / 0.62) 0px,
+        oklch(0.05 0.005 65 / 0.30) 80px,
+        transparent 140px
       ),
       linear-gradient(
         100deg,
-        oklch(0.07 0.005 65 / 0.72) 0%,
-        oklch(0.07 0.005 65 / 0.52) 26%,
-        oklch(0.07 0.005 65 / 0.18) 55%,
-        transparent 75%
+        oklch(0.06 0.005 65 / 0.78) 0%,
+        oklch(0.06 0.005 65 / 0.58) 22%,
+        oklch(0.06 0.005 65 / 0.22) 48%,
+        transparent 68%
       );
   }
 
   /* Background dim on product hover — combined with the focused-product halo */
   .studio:has(.product-link:hover) :global(.scene-bg img),
   .studio:has(.product-link:focus-visible) :global(.scene-bg img) {
-    filter: brightness(0.50) saturate(0.85);
+    filter: brightness(0.55) saturate(0.85);
   }
 
   /* ============================================================
-   * Overlay — title + subhead + CTAs sit on the photograph
+   * Site header — overlaid on the scene
+   * ============================================================ */
+  .site-nav {
+    position: absolute;
+    z-index: 4;
+    top: 0;
+    left: 0;
+    right: 0;
+    padding: var(--space-roomy) clamp(var(--container-edge), 4vw, 3.5rem);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-loose);
+    flex-wrap: wrap;
+  }
+
+  .identity {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.55ch;
+    text-decoration: none;
+    color: inherit;
+    font-family: var(--font-mono);
+    text-transform: uppercase;
+    letter-spacing: var(--ls-meta-allcaps);
+  }
+
+  .identity-name {
+    font-size: var(--fs-small);
+    font-weight: 500;
+    color: var(--ink-strong);
+  }
+
+  .identity-sep {
+    color: var(--key-light);
+    font-size: var(--fs-small);
+  }
+
+  .identity-role {
+    font-size: var(--fs-small);
+    color: var(--key-light);
+    font-weight: 500;
+  }
+
+  .primary-nav {
+    display: flex;
+    gap: var(--space-roomy);
+    flex-wrap: wrap;
+  }
+
+  .primary-nav a {
+    font-family: var(--font-body);
+    font-size: var(--fs-body);
+    color: var(--ink-strong);
+    text-decoration: none;
+    padding: var(--space-tight) 0;
+    border-bottom: 1px solid transparent;
+    transition:
+      color var(--dur-quick) var(--ease-focus-pull),
+      border-color var(--dur-quick) var(--ease-focus-pull);
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .primary-nav a:first-child {
+    color: var(--key-light);
+  }
+
+  .primary-nav a:hover,
+  .primary-nav a:focus-visible {
+    color: var(--key-light);
+    border-bottom-color: var(--key-light);
+  }
+
+  .primary-nav a:focus-visible {
+    outline: 2px solid var(--key-light);
+    outline-offset: 4px;
+  }
+
+  /* ============================================================
+   * Overlay — title + subhead + CTAs on the left of the scene
    * ============================================================ */
   .scene-overlay {
     position: absolute;
     z-index: 2;
-    top: 18%;
-    left: 5%;
+    top: 22%;
+    left: clamp(var(--container-edge), 4vw, 3.5rem);
     right: auto;
-    width: min(62%, 46rem);
+    width: min(46%, 36rem);
     padding: 0;
     pointer-events: none;
   }
@@ -515,11 +504,11 @@ const risks = [
     font-family: var(--font-display);
     font-size: var(--fs-display);
     font-weight: 600;
-    line-height: 0.98;
+    line-height: 1.02;
     letter-spacing: var(--ls-display);
     color: var(--ink-strong);
     margin: 0;
-    max-width: 18ch;
+    max-width: 16ch;
     text-wrap: balance;
     display: flex;
     flex-direction: column;
@@ -531,13 +520,12 @@ const risks = [
   }
 
   .title-line--soft {
-    font-style: italic;
-    color: var(--ink-muted);
+    color: var(--ink-strong);
   }
 
   .subhead {
-    margin: var(--space-base) 0 0;
-    max-width: 70ch;
+    margin: var(--space-loose) 0 0;
+    max-width: 48ch;
     color: var(--ink);
     font-family: var(--font-body);
     font-size: var(--fs-body-lg);
@@ -546,14 +534,48 @@ const risks = [
 
   .cta-row {
     list-style: none;
-    margin: var(--space-loose) 0 0;
+    margin: var(--space-roomy) 0 0;
     padding: 0;
     display: flex;
-    gap: var(--space-loose);
+    gap: var(--space-roomy);
+    align-items: center;
     flex-wrap: wrap;
   }
 
-  .cta {
+  /* Primary CTA — solid warm-tungsten button (key-light fill) */
+  .cta--primary {
+    font-family: var(--font-body);
+    font-size: var(--fs-body);
+    font-weight: 500;
+    color: oklch(0.18 0.012 65);
+    background: var(--key-light);
+    text-decoration: none;
+    padding: 0.85rem 1.4rem;
+    border: 1px solid var(--key-light);
+    border-radius: 2px;
+    transition:
+      background var(--dur-quick) var(--ease-focus-pull),
+      color var(--dur-quick) var(--ease-focus-pull),
+      transform var(--dur-quick) var(--ease-focus-pull);
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .cta--primary:hover,
+  .cta--primary:focus-visible {
+    background: var(--key-light-soft);
+    border-color: var(--key-light-soft);
+    transform: translateY(-1px);
+  }
+
+  .cta--primary:focus-visible {
+    outline: 2px solid var(--ink-strong);
+    outline-offset: 4px;
+  }
+
+  /* Quiet CTA — text link with arrow, key-light tone */
+  .cta--quiet {
     font-family: var(--font-body);
     font-size: var(--fs-body);
     font-weight: 500;
@@ -569,37 +591,33 @@ const risks = [
     align-items: center;
   }
 
-  .cta::after {
+  .cta--quiet::after {
     content: ' →';
     white-space: nowrap;
-    margin-left: 0.2ch;
+    margin-left: 0.3ch;
     transition: transform var(--dur-quick) var(--ease-focus-pull);
     display: inline-block;
   }
 
-  .cta:hover,
-  .cta:focus-visible {
+  .cta--quiet:hover,
+  .cta--quiet:focus-visible {
     color: var(--ink-strong);
     border-color: var(--ink-strong);
   }
 
-  .cta:hover::after,
-  .cta:focus-visible::after {
+  .cta--quiet:hover::after,
+  .cta--quiet:focus-visible::after {
     transform: translateX(3px);
   }
 
-  .cta:focus-visible {
+  .cta--quiet:focus-visible {
     outline: 2px solid var(--key-light);
     outline-offset: 6px;
     border-color: transparent;
   }
 
-  .cta--quiet {
-    color: var(--ink-muted);
-  }
-
   /* ============================================================
-   * Products — layered cutouts on the table
+   * Products — layered cutouts on the table (right side)
    * ============================================================ */
   .products {
     position: absolute;
@@ -801,32 +819,25 @@ const risks = [
   }
 
   /* ============================================================
-   * Risks — production risks I design around
+   * Risks — 4 plates in a row beneath the hero
    * ============================================================
    * Editorial plates, NOT a SaaS card grid:
    *   - Serif numeral (01) is the visual anchor, no rounded icon tile
-   *   - Hairline borders only; no nested cards inside cards
-   *   - Image placeholder is landscape (photo-studio frame)
-   *   - Technique strip is mono, hairline divider above
+   *   - Hairline border around plate; mono "Failure pattern" / "Design response"
+   *     micro-labels carry the structure instead of icons
+   *   - Four columns at >=900px; collapses progressively below
    * ============================================================ */
   .risks {
-    padding-top: var(--space-vast);
+    /* Pulled tight to the hero so the title peeks above the fold. Increase
+       padding-top if it feels cramped after the hero crop lands. */
+    padding-top: var(--space-roomy);
     padding-bottom: var(--space-spacious);
     scroll-margin-top: 6vh;
   }
 
   .risks-head {
-    max-width: var(--measure-wide);
-    margin-bottom: var(--space-spacious);
-  }
-
-  .risks-eyebrow {
-    font-family: var(--font-mono);
-    font-size: var(--fs-caption);
-    color: var(--ink-faint);
-    letter-spacing: var(--ls-meta-allcaps);
-    text-transform: uppercase;
-    margin: 0 0 var(--space-snug);
+    max-width: 38rem;
+    margin-bottom: var(--space-loose);
   }
 
   .risks-title {
@@ -837,16 +848,9 @@ const risks = [
     letter-spacing: var(--ls-heading);
     color: var(--ink-strong);
     margin: 0;
-    max-width: 22ch;
+    /* One-line headline on desktop; mobile may wrap at the 640px breakpoint. */
+    max-width: none;
     text-wrap: balance;
-  }
-
-  .risks-deck {
-    margin: var(--space-base) 0 0;
-    color: var(--ink-muted);
-    font-size: var(--fs-body-lg);
-    line-height: 1.55;
-    max-width: 68ch;
   }
 
   .risk-grid {
@@ -854,97 +858,39 @@ const risks = [
     margin: 0;
     padding: 0;
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: var(--space-spacious) var(--space-roomy);
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--space-loose);
   }
 
   .risk {
     display: flex;
     flex-direction: column;
-    gap: var(--space-base);
-  }
-
-  .risk-thumb {
-    aspect-ratio: 4 / 3;
-    background:
-      linear-gradient(
-        135deg,
-        var(--surface-raised) 0%,
-        var(--surface) 100%
-      );
+    gap: var(--space-snug);
+    padding: var(--space-loose);
     border: 1px solid var(--border-hairline);
     border-radius: 3px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .risk-thumb::before {
-    /* Corner registration mark — hints at a contact-sheet frame */
-    content: '';
-    position: absolute;
-    top: 8px;
-    left: 8px;
-    width: 18px;
-    height: 18px;
-    border-top: 1px solid var(--border-key);
-    border-left: 1px solid var(--border-key);
-    opacity: 0.55;
-  }
-
-  .risk-thumb::after {
-    content: '';
-    position: absolute;
-    bottom: 8px;
-    right: 8px;
-    width: 18px;
-    height: 18px;
-    border-bottom: 1px solid var(--border-key);
-    border-right: 1px solid var(--border-key);
-    opacity: 0.55;
-  }
-
-  .risk-thumb-meta {
-    font-family: var(--font-mono);
-    font-size: var(--fs-caption);
-    color: var(--ink-faint);
-    letter-spacing: var(--ls-caption);
-    text-transform: uppercase;
-  }
-
-  .risk-body {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-snug);
+    background: oklch(0.11 0.008 65 / 0.6);
   }
 
   .risk-number {
-    margin: 0;
+    margin: 0 0 var(--space-snug);
     display: inline-flex;
     align-items: baseline;
     gap: 0.3ch;
-    font-family: var(--font-display);
+    font-family: var(--font-mono);
     color: var(--key-light);
   }
 
   .risk-number-numeral {
-    font-size: var(--fs-h2);
-    font-weight: 600;
-    letter-spacing: -0.02em;
+    font-size: var(--fs-body);
+    font-weight: 500;
+    letter-spacing: var(--ls-caption);
     line-height: 1;
-  }
-
-  .risk-number-slash {
-    font-size: var(--fs-h3);
-    color: var(--ink-faint);
-    font-weight: 400;
   }
 
   .risk-title {
     font-family: var(--font-display);
-    font-size: var(--fs-h3);
+    font-size: var(--fs-subhead);
     font-weight: 600;
     line-height: var(--lh-heading);
     letter-spacing: var(--ls-heading);
@@ -953,23 +899,48 @@ const risks = [
     text-wrap: balance;
   }
 
+  .risk-label {
+    margin: var(--space-snug) 0 calc(var(--space-snug) * -0.4);
+    font-family: var(--font-mono);
+    font-size: var(--fs-caption);
+    color: var(--key-light);
+    letter-spacing: var(--ls-meta-allcaps);
+    text-transform: uppercase;
+  }
+
+  .risk-label--response {
+    margin-top: var(--space-loose);
+    padding-top: var(--space-base);
+    border-top: 1px solid var(--border-hairline);
+  }
+
+  /* Per-plate accent rotation — distinct identity without new colors.
+     Cycles through locked tokens (key, key-soft, rim, key) so each plate
+     reads as its own beat while staying inside the warm-tungsten palette. */
+  .risk--bad-inputs .risk-number,
+  .risk--silent-failure .risk-number {
+    color: var(--key-light);
+  }
+  .risk--untrusted-outputs .risk-number {
+    color: var(--key-light-soft);
+  }
+  .risk--no-evaluation-loop .risk-number {
+    color: var(--rim-light);
+  }
+
   .risk-text {
     margin: 0;
     color: var(--ink);
-    font-size: var(--fs-body);
+    font-size: var(--fs-small);
     line-height: 1.55;
-    max-width: 56ch;
   }
 
   .risk-techniques {
-    margin: var(--space-snug) 0 0;
-    padding-top: var(--space-snug);
-    border-top: 1px solid var(--border-hairline);
-    font-family: var(--font-mono);
-    font-size: var(--fs-caption);
-    color: var(--ink-muted);
-    line-height: 1.6;
-    letter-spacing: var(--ls-caption);
+    margin: 0;
+    font-family: var(--font-body);
+    font-size: var(--fs-small);
+    color: var(--ink);
+    line-height: 1.55;
   }
 
   .risk-tech-sep {
@@ -1085,54 +1056,60 @@ const risks = [
   /* ============================================================
    * Responsive
    * ============================================================ */
+  @media (max-width: 1100px) {
+    .risk-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
   @media (max-width: 900px) {
     .scene {
       aspect-ratio: 4 / 3;
-      min-height: auto;
+      min-height: 480px;
     }
 
     .scene-overlay {
       width: min(70%, 32rem);
-      top: 16%;
-      left: 5%;
+      top: 18%;
     }
 
-    .risk-grid {
-      gap: var(--space-roomy);
+    .site-nav {
+      padding: var(--space-loose) var(--container-edge);
+      gap: var(--space-base);
     }
   }
 
   @media (max-width: 640px) {
     .scene {
       aspect-ratio: 4 / 5;
-      min-height: auto;
+      min-height: 540px;
     }
 
     /* Overlay stays absolute on the photograph; widen it for narrow viewports.
        Tint stays — it's still doing contrast work behind the title. */
     .scene-overlay {
       width: 88%;
-      top: 4%;
-      left: 4%;
+      top: 16%;
+      left: var(--container-edge);
     }
 
     /* Reposition products for vertical scene */
     .product--binder {
       --px: 50%;
-      --py: 64%;
-      --pw: 42%;
+      --py: 66%;
+      --pw: 38%;
       --cap-gap: -2.5rem;
     }
     .product--mic {
-      --px: 76%;
-      --py: 80%;
-      --pw: 18%;
+      --px: 78%;
+      --py: 82%;
+      --pw: 16%;
       --cap-gap: 0.75rem;
     }
     .product--bulb {
       --px: 24%;
-      --py: 78%;
-      --pw: 22%;
+      --py: 80%;
+      --pw: 20%;
       --cap-gap: -1rem;
     }
 
@@ -1187,7 +1164,7 @@ const risks = [
     }
 
     .primary-nav a {
-      font-size: var(--fs-caption);
+      font-size: var(--fs-small);
     }
   }
 

@@ -287,3 +287,43 @@ Documented in `docs/design-decisions.md` §11 with full rationale. To be applied
 - Tune product positions / sizes / highlight intensity per user feedback
 - `/impeccable critique` once composition feels locked
 - User sign-off on the remaining §4.1 amendment
+
+---
+
+## Day 4 — 2026-05-25 (v11 home: wide bg + 4-up risks)
+
+**User direction (reference image supplied):**
+- New full-bleed background `docs/background wide.png` (wide composition: softbox left-of-center, round table on the right)
+- Identity top-left (uppercase mono wordmark), nav top-right, both overlaid on the scene
+- Hero copy block (title + subhead + CTAs) on the left dark cove
+- Existing product cutouts (binder/mic/bulb) re-anchored to the right-side table
+- Risks grid: 2x2 → 4-up row of editorial plates
+
+**Shipped:**
+- `src/assets/home-bg-wide.png` copied from `docs/`; Astro `<Picture>` pipeline emits 4 AVIF widths (largest 36 KB compressed from 1408 KB source)
+- `src/pages/index.astro` v11 — full-bleed studio scene (escapes `--container-wide`), nav overlaid on top, hero overlay locked to left third, products re-positioned (bulb 60%, binder 76% hero, mic 92%), 4-up risk grid with "Failure pattern / Design response" mono labels, primary CTA promoted to solid warm-tungsten button to match reference
+- Identity switched from serif → uppercase Geist Mono with key-light separator (matches reference; consistent with locked typography meta role)
+- Site nav z-index 4 over scene; scene-tint gradient retuned (78%→0 left-to-right) to guarantee AA on overlaid title
+
+**Impeccable critique pass (manual — detect.mjs bundle missing):**
+- 0 hard blockers from the 27-rule anti-pattern list (no hex / side-stripes / gradient text / glassmorphism / hero-metric / nested cards / banned fonts / bounce-easing / backdrop-filter abuse)
+- P1: em dash in `aria-label` — FIXED (`"Guru Balamurugan, home"`)
+- P1: risks-section heading hierarchy was inverted vs. reference — FIXED (now H2 = "Where AI initiatives break.", deck = "Most projects fail in predictable ways. I focus on the layers that make AI systems reliable.")
+- P2: hairline divider above "Design response" label restored on each plate (impeccable spacing law — vary for rhythm)
+- P2: per-plate numeral accent rotation across locked tokens (key / key-soft / rim / key) so each plate has distinct identity without introducing new colors
+- P2 declined: top-nav contrast guard (defensive only; current bg dark enough at top)
+
+**Verification:**
+- `pnpm check` clean (0 errors / 0 warnings / 0 hints across 9 files)
+- `pnpm build` clean (3 pages built, 4.12s)
+- New bg AVIF 36 KB largest variant — home weight envelope still inside ≤200 KB target
+
+**Out of scope this session (deferred):**
+- Real-device responsive eye-check on Android mid-tier (next session)
+- `pnpm a11y` re-run on built `dist/` (next session — type/build gates passed, axe gate not re-validated)
+- Lighthouse CWV re-baseline against new hero bg
+
+**Next:**
+- User eye-check in browser (`pnpm dev` → localhost:4321), particularly product position alignment on the new table geometry
+- Re-run `pnpm a11y` and `pnpm lh` once positions are locked
+- Then commit v11
