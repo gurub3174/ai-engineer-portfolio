@@ -6,7 +6,6 @@ const projects = defineCollection({
   type: 'content', // MDX body for the case-study narrative
   schema: z.object({
     title: z.string().min(3),
-    slug: z.string().regex(/^[a-z0-9-]+$/, 'slug must be kebab-case'),
     hero_object: z.enum(['microphone', 'printer', 'lightbulb']),
     asset_strategy: z.enum(['stock-photo', 'r3f-model']),
     asset_url: z.string(),

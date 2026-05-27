@@ -1,0 +1,94 @@
+---
+title: AI design team
+hero_object: lightbulb
+asset_strategy: r3f-model
+asset_url: /og/ai-design-team.png
+one_line_pitch: "Four agents argue a design brief into a finished spec. The argumentation log itself is the deliverable."
+status: shipped
+tech_stack:
+  - Forge
+  - Claude Code
+  - Markdown knowledge base
+  - Python
+role: Designer and builder of the agent system
+timeline: 2026-Q1 to 2026-Q2
+tags:
+  - ai
+  - agents
+  - shipped
+problem: >-
+  The old design loop was the bottleneck. Solo workflow: idea, then hours
+  of research, then manual design, then prompt an LLM as an "expert" to
+  evaluate it, then build. Each round took hours, and the moment the
+  context window filled, the LLM would hallucinate revisions that
+  contradicted decisions made five seconds earlier. The "expert" framing
+  was the deeper problem. PRISM (2025) showed flattery in system prompts
+  activates marketing-text patterns from training data rather than
+  technical expertise. So I was burning hours building a review loop on
+  top of an LLM that was role-playing a critic, not actually doing the
+  review.
+approach: >-
+  Adopted Forge (credit jdforsythe) instead of building a framework from
+  scratch. The core call was to imitate organizational roles, not invent
+  abstract task lists. Settled on a 4-agent shape (1 lead in the CTO
+  pattern plus 3 subagents) after testing larger fan-outs and watching
+  coordination overhead swamp the marginal output. Four principles drove
+  the design. (1) Persistent knowledge base in Obsidian-style markdown,
+  citing A-MEM (NeurIPS 2025) where structured notes outperform flat
+  vector storage. (2) Two-sided validation where downstream agents
+  re-verify upstream work with rejection authority, per MetaGPT (ICLR
+  2024) for roughly 40 percent error reduction. (3) Per-agent playbooks
+  that evolve across sessions, per ACE (2025) for +10.6 percent on agent
+  tasks. (4) Adaptive pipeline where agents join when needed rather than
+  running a fixed chain, per Captain Agent (2024) for +22 percent over
+  static teams. Rejected pure vector-DB memory and rubber-stamp approval
+  flows because those were the failure modes I had already hit with the
+  solo expert-prompt loop.
+what_didnt_work: >-
+  First instinct was "more agents equals more coverage." Spun up seven
+  agents in a debate ring and watched coordination tokens outpace useful
+  output by roughly 3x. Cut to four and quality jumped. Second wrong
+  turn: tried flat vector-DB memory for persistence. Retrieval was
+  unpredictable on long-form design briefs, and agents kept losing
+  decisions made earlier in the same session. Switched to Obsidian-style
+  markdown notes with explicit cross-links, per A-MEM. Third: initial
+  system prompts framed each agent as "world's best [role]." The PRISM
+  (2025) finding that flattery in the system prompt drops accuracy
+  roughly 40 percent landed on me directly when the CTO agent started
+  writing in pitch-deck cadence instead of technical critique. Stripped
+  identity prompts to under 50 tokens (brief identity, clear role, no
+  superlatives) and accuracy returned. The unsolved problem I am still
+  working: context caps before drift. Each agent has a per-task budget
+  but I do not yet have a calibrated number, just heuristics.
+outcomes: >-
+  Shipped the 4-agent pipeline (1 CTO lead plus 3 subagents: design,
+  build, critic) on top of Forge. The design phase, which I used to
+  skip, is now the load-bearing step. Every spec gets argued before code
+  runs, and the argumentation log is a deliverable in its own right.
+  Two-sided validation catches the ~40 percent error band that the
+  rubber-stamp loop missed (MetaGPT, ICLR 2024). Per-agent playbooks
+  compound across sessions per the ACE (2025) +10.6 percent finding, so
+  the team sharpens without me retuning prompts. The piece still open:
+  empirically calibrating context caps per agent. Current working range
+  is 30 to 50 percent of the model's effective window before drift
+  becomes observable, but that needs more sessions to firm up. Next
+  iteration: instrument drift markers (decision-recall checks) so the
+  budget self-tunes rather than relying on my eyeball.
+build_logs: []
+blogs: []
+embedded_media: []
+---
+
+## Cited research
+
+The agent design rests on four findings. They are cited inline above; collected here for the reader who wants to follow the trail.
+
+- **PRISM (2025).** Flattery in system prompts activates marketing-text patterns from training data, dropping accuracy roughly 40 percent. Brief identities under 50 tokens outperform elaborate ones.
+- **A-MEM (NeurIPS 2025).** Structured Obsidian-style markdown notes outperform flat vector-DB storage for agent long-horizon memory.
+- **MetaGPT (ICLR 2024).** Two-sided validation, where downstream agents re-verify upstream work with rejection authority, cuts errors by roughly 40 percent.
+- **ACE (2025).** Per-agent playbooks that evolve across sessions deliver +10.6 percent on agent tasks.
+- **Captain Agent (2024).** Adaptive pipelines (agents join when needed) outperform static chains by +22 percent.
+
+## Open question
+
+How much memory before the agent starts drifting? Current working range is 30 to 50 percent of the model's effective context window per agent before decision-recall errors become observable. The next instrumentation pass adds explicit decision-recall probes so the budget self-tunes rather than relying on my eyeball.

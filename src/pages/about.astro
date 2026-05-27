@@ -1,0 +1,546 @@
+---
+import { Picture } from 'astro:assets';
+import BaseLayout from '@layouts/BaseLayout.astro';
+import portrait from '../assets/about/portrait.jpg';
+
+/*
+ * About — identity statement + photographer-to-engineer decoder.
+ *
+ * Architecture §4.4: identity statement, 3-5 decoder pairs, single CTA
+ * (contact). Bio prose is interview-pending and intentionally omitted
+ * until written (content-conventions bans stale placeholders).
+ *
+ * Layout mirrors the case-study shell: same site-nav + page-footer,
+ * single-column body, 65-75ch measure, numeral framing on the decoder.
+ */
+
+const decoder = [
+  {
+    n: '01',
+    photography: 'Composition',
+    engineering: 'Information architecture',
+    caption:
+      'Rule-of-thirds, leading lines, negative space. In code, those become layout grids, scan patterns, breathing room around the load-bearing element.',
+  },
+  {
+    n: '02',
+    photography: 'Key light',
+    engineering: 'Primary signal',
+    caption:
+      'The one source the eye lands on first. In an LLM pipeline, it is the one piece of context the model must not lose. Everything else is fill.',
+  },
+  {
+    n: '03',
+    photography: 'Iteration in the darkroom',
+    engineering: 'Iteration on training runs',
+    caption:
+      'Develop, evaluate, adjust the chemistry, develop again. Same loop with eval harnesses, prompt variants, and ablation runs.',
+  },
+  {
+    n: '04',
+    photography: 'Frame, focus, exposure',
+    engineering: 'Constraint, attention, signal-to-noise',
+    caption:
+      'Three knobs that decide what gets included, what stays sharp, and how loud the result is. Engineering systems have the same three; the labels change.',
+  },
+];
+---
+
+<BaseLayout
+  title="About · Guru Balamurugan"
+  description="Photographer's eye, engineer's discipline. The decoder mapping photography vocabulary onto AI engineering practice."
+>
+  <a href="#identity" class="skip-link">Skip to the about content</a>
+
+  <header class="site-nav">
+    <a class="identity" href="/" aria-label="Guru Balamurugan, home">
+      <span class="identity-name">Guru Balamurugan</span>
+      <span class="identity-sep" aria-hidden="true">·</span>
+      <span class="identity-role">AI Engineer</span>
+    </a>
+
+    <nav class="primary-nav" aria-label="Primary">
+      <a href="/#studio">Projects</a>
+      <a href="/resume">Resume</a>
+      <a href="/about" aria-current="page">About</a>
+      <a href="/contact">Contact</a>
+    </nav>
+  </header>
+
+  <main>
+    <article id="identity" class="about" aria-labelledby="about-title">
+      <header class="about-head">
+        <p class="about-eyebrow">About</p>
+        <h1 id="about-title" class="about-title">
+          Photographer's eye, engineer's discipline.
+        </h1>
+        <p class="about-pitch">
+          The site is shot like a studio because that is how I think about
+          systems. Light the subject, hide the rig, label every decision
+          someone else might have to re-read at 2am.
+        </p>
+      </header>
+
+      <figure class="portrait">
+        <Picture
+          src={portrait}
+          alt="Portrait of Guru Balamurugan."
+          widths={[360, 480, 720, 960]}
+          sizes="(min-width: 720px) 360px, 60vw"
+          formats={['avif', 'webp']}
+          quality={70}
+          loading="eager"
+          fetchpriority="high"
+        />
+      </figure>
+
+      <section class="decoder" aria-labelledby="decoder-title">
+        <h2 id="decoder-title" class="decoder-title">The decoder</h2>
+        <p class="decoder-lede">
+          Four pairs. Photography vocabulary on the left, the engineering
+          term it maps to on the right. Proof the photographer signal is
+          intentional, not coincidental.
+        </p>
+
+        <ol class="pairs" role="list">
+          {decoder.map((p) => (
+            <li class="pair">
+              <p class="pair-num"><span class="pair-num-numeral">{p.n}</span></p>
+              <div class="pair-cols">
+                <p class="pair-photo">{p.photography}</p>
+                <p class="pair-arrow" aria-hidden="true">→</p>
+                <p class="pair-eng">{p.engineering}</p>
+              </div>
+              <p class="pair-caption">{p.caption}</p>
+            </li>
+          ))}
+        </ol>
+      </section>
+
+      <section class="cta-block" aria-labelledby="cta-title">
+        <h2 id="cta-title" class="cta-title">Want to talk?</h2>
+        <p class="cta-lede">
+          Hiring for AI or data engineering, or just want to compare notes
+          on agent frameworks. Either works.
+        </p>
+        <a class="cta" href="/contact">Get in touch</a>
+      </section>
+    </article>
+  </main>
+
+  <footer class="page-footer">
+    <p class="footer-line">The work, lit and labeled.</p>
+    <ul class="footer-links" role="list">
+      <li><a href="https://github.com/" rel="me noreferrer">GitHub</a></li>
+      <li><a href="https://www.linkedin.com/" rel="me noreferrer">LinkedIn</a></li>
+      <li><a href="/resume">Resume</a></li>
+      <li><a href="/contact">Contact</a></li>
+    </ul>
+    <p class="footer-meta">Astro · Cloudflare Pages · open source · 2026</p>
+  </footer>
+</BaseLayout>
+
+<style>
+  .skip-link {
+    position: absolute;
+    left: var(--container-edge);
+    top: var(--container-edge);
+    padding: var(--space-snug) var(--space-base);
+    background: var(--surface-raised);
+    color: var(--key-light);
+    border: 1px solid var(--border-key);
+    border-radius: 2px;
+    z-index: 300;
+    transform: translateY(-200%);
+    transition: transform var(--dur-quick) var(--ease-focus-pull);
+  }
+  .skip-link:focus-visible {
+    transform: translateY(0);
+  }
+
+  .site-nav,
+  .about,
+  .page-footer {
+    width: 100%;
+    max-width: var(--container-wide);
+    margin-inline: auto;
+    padding-inline: var(--container-edge);
+  }
+
+  .site-nav {
+    padding-top: var(--space-roomy);
+    padding-bottom: var(--space-roomy);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-loose);
+    flex-wrap: wrap;
+  }
+
+  .identity {
+    display: inline-flex;
+    align-items: baseline;
+    gap: var(--space-snug);
+    color: var(--ink-strong);
+    text-decoration: none;
+    font-family: var(--font-mono);
+    font-size: var(--fs-caption);
+    letter-spacing: var(--ls-meta-allcaps);
+    text-transform: uppercase;
+    min-height: 44px;
+  }
+
+  .identity-sep {
+    color: var(--key-light);
+  }
+
+  .identity-role {
+    color: var(--ink-muted);
+  }
+
+  .primary-nav {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-loose);
+    flex-wrap: wrap;
+  }
+
+  .primary-nav a {
+    font-family: var(--font-mono);
+    font-size: var(--fs-caption);
+    color: var(--ink-muted);
+    letter-spacing: var(--ls-meta-allcaps);
+    text-transform: uppercase;
+    text-decoration: none;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    border-bottom: 1px solid transparent;
+    transition:
+      color var(--dur-quick) var(--ease-focus-pull),
+      border-color var(--dur-quick) var(--ease-focus-pull);
+  }
+
+  .primary-nav a:hover,
+  .primary-nav a:focus-visible {
+    color: var(--ink-strong);
+    border-bottom-color: var(--key-light);
+  }
+
+  .primary-nav a[aria-current='page'] {
+    color: var(--ink-strong);
+    border-bottom-color: var(--key-light);
+  }
+
+  .about {
+    padding-top: var(--space-spacious);
+    padding-bottom: var(--space-roomy);
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-loose);
+  }
+
+  .about-head {
+    max-width: 68ch;
+  }
+
+  .about-eyebrow {
+    font-family: var(--font-mono);
+    font-size: var(--fs-caption);
+    color: var(--ink-faint);
+    letter-spacing: var(--ls-meta-allcaps);
+    text-transform: uppercase;
+    margin: 0 0 var(--space-base);
+  }
+
+  .about-title {
+    font-family: var(--font-display);
+    font-size: var(--fs-display);
+    font-weight: 600;
+    line-height: 1.04;
+    letter-spacing: var(--ls-display);
+    color: var(--ink-strong);
+    margin: 0;
+    max-width: 22ch;
+  }
+
+  .about-pitch {
+    margin: var(--space-loose) 0 0;
+    max-width: 60ch;
+    color: var(--ink-muted);
+    font-family: var(--font-body);
+    font-size: var(--fs-body-lg);
+    line-height: 1.55;
+  }
+
+  .portrait {
+    margin: var(--space-loose) 0 0;
+    padding: 0;
+    max-width: 360px;
+  }
+
+  .portrait :global(img) {
+    width: 100%;
+    height: auto;
+    display: block;
+    border-radius: 2px;
+    box-shadow: 0 24px 60px -32px oklch(0.05 0.008 65 / 0.45);
+  }
+
+  .decoder {
+    margin-top: var(--space-spacious);
+    border-top: 1px solid var(--border-hairline);
+    padding-top: var(--space-spacious);
+  }
+
+  .decoder-title {
+    font-family: var(--font-display);
+    font-size: var(--fs-h2);
+    font-weight: 600;
+    line-height: 1.1;
+    letter-spacing: var(--ls-display);
+    color: var(--ink-strong);
+    margin: 0;
+  }
+
+  .decoder-lede {
+    margin: var(--space-base) 0 var(--space-spacious);
+    max-width: 60ch;
+    color: var(--ink-muted);
+    font-family: var(--font-body);
+    font-size: var(--fs-body);
+    line-height: 1.6;
+  }
+
+  .pairs {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: var(--space-spacious);
+  }
+
+  .pair {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-base);
+  }
+
+  .pair-num {
+    font-family: var(--font-mono);
+    font-size: var(--fs-caption);
+    color: var(--key-light);
+    letter-spacing: var(--ls-meta-allcaps);
+    margin: 0;
+  }
+
+  .pair-cols {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: baseline;
+    gap: var(--space-base);
+    max-width: 68ch;
+  }
+
+  .pair-photo,
+  .pair-eng {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: var(--fs-h3);
+    font-weight: 500;
+    line-height: 1.15;
+    color: var(--ink-strong);
+  }
+
+  .pair-eng {
+    color: var(--ink);
+  }
+
+  .pair-arrow {
+    margin: 0;
+    color: var(--key-light);
+    font-family: var(--font-mono);
+    font-size: var(--fs-h3);
+    line-height: 1.15;
+  }
+
+  .pair-caption {
+    margin: 0;
+    max-width: 65ch;
+    color: var(--ink-muted);
+    font-family: var(--font-body);
+    font-size: var(--fs-body);
+    line-height: 1.65;
+  }
+
+  .cta-block {
+    margin-top: var(--space-spacious);
+    padding-top: var(--space-spacious);
+    border-top: 1px solid var(--border-hairline);
+    max-width: 60ch;
+  }
+
+  .cta-title {
+    font-family: var(--font-display);
+    font-size: var(--fs-h2);
+    font-weight: 600;
+    line-height: 1.1;
+    letter-spacing: var(--ls-display);
+    color: var(--ink-strong);
+    margin: 0;
+  }
+
+  .cta-lede {
+    margin: var(--space-base) 0 var(--space-loose);
+    color: var(--ink-muted);
+    font-family: var(--font-body);
+    font-size: var(--fs-body-lg);
+    line-height: 1.55;
+  }
+
+  .cta {
+    font-family: var(--font-body);
+    font-size: var(--fs-body);
+    font-weight: 500;
+    color: var(--key-light);
+    text-decoration: none;
+    padding-bottom: 2px;
+    border-bottom: 1px solid currentColor;
+    transition:
+      color var(--dur-quick) var(--ease-focus-pull),
+      border-color var(--dur-quick) var(--ease-focus-pull);
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .cta::after {
+    content: ' →';
+    white-space: nowrap;
+    margin-left: 0.2ch;
+    transition: transform var(--dur-quick) var(--ease-focus-pull);
+    display: inline-block;
+  }
+
+  .cta:hover,
+  .cta:focus-visible {
+    color: var(--ink-strong);
+    border-color: var(--ink-strong);
+  }
+
+  .cta:hover::after,
+  .cta:focus-visible::after {
+    transform: translateX(3px);
+  }
+
+  .cta:focus-visible {
+    outline: 2px solid var(--key-light);
+    outline-offset: 6px;
+    border-color: transparent;
+  }
+
+  .page-footer {
+    padding-top: var(--space-spacious);
+    padding-bottom: var(--space-roomy);
+    border-top: 1px solid var(--border-hairline);
+    margin-top: var(--space-roomy);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-base);
+    text-align: center;
+  }
+
+  .footer-line {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: var(--fs-body-lg);
+    font-style: italic;
+    color: var(--ink-muted);
+  }
+
+  .footer-links {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--space-loose);
+  }
+
+  .footer-links a {
+    font-family: var(--font-body);
+    font-size: var(--fs-small);
+    color: var(--ink-muted);
+  }
+
+  .footer-meta {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: var(--fs-caption);
+    color: var(--ink-faint);
+    letter-spacing: 0.02em;
+  }
+
+  @media (min-width: 720px) {
+    .about {
+      grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+      grid-template-areas:
+        'head portrait'
+        'decoder decoder'
+        'cta cta';
+      column-gap: var(--space-spacious);
+      align-items: start;
+    }
+
+    .about-head {
+      grid-area: head;
+    }
+
+    .portrait {
+      grid-area: portrait;
+      margin: 0;
+      justify-self: end;
+    }
+
+    .decoder {
+      grid-area: decoder;
+    }
+
+    .cta-block {
+      grid-area: cta;
+    }
+
+    .pair {
+      grid-template-columns: 4ch minmax(0, 1fr);
+      grid-template-areas:
+        'num cols'
+        '. caption';
+      column-gap: var(--space-base);
+    }
+
+    .pair-num {
+      grid-area: num;
+    }
+
+    .pair-cols {
+      grid-area: cols;
+    }
+
+    .pair-caption {
+      grid-area: caption;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .pair-cols {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .pair-arrow {
+      transform: rotate(90deg);
+      width: max-content;
+    }
+  }
+</style>

@@ -4,7 +4,9 @@
       "staticDistDir": "./dist",
       "url": [
         "http://localhost/index.html",
+        "http://localhost/about/index.html",
         "http://localhost/design-reference/index.html",
+        "http://localhost/projects/ai-design-team/index.html",
         "http://localhost/resume/index.html"
       ],
       "settings": {

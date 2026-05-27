@@ -1,0 +1,750 @@
+---
+import { getCollection, type CollectionEntry } from 'astro:content';
+import BaseLayout from '@layouts/BaseLayout.astro';
+
+/*
+ * Case-study route — renders any entry from src/content/projects/.
+ *
+ * Schema is enforced in src/content/config.ts: problem / approach /
+ * what_didnt_work / outcomes each require min(200) chars. Build fails
+ * on stub content; that is the discipline mechanism per Critic C1.
+ *
+ * Layout: single-column, 65-75ch body measure (impeccable readability
+ * law), serif display headings, numeral framing on each section to
+ * echo the home /risks editorial plates. No card nesting, no SaaS
+ * grid. MDX body slot at the bottom for anything that doesn't fit a
+ * required section.
+ */
+
+export async function getStaticPaths() {
+  const projects = await getCollection('projects');
+  return projects.map((project) => ({
+    params: { slug: project.slug },
+    props: { project },
+  }));
+}
+
+type Props = { project: CollectionEntry<'projects'> };
+const { project } = Astro.props;
+const { Content } = await project.render();
+const fm = project.data;
+
+const sections = [
+  { n: '01', id: 'problem', title: 'Problem', body: fm.problem },
+  { n: '02', id: 'approach', title: 'Approach', body: fm.approach },
+  { n: '03', id: 'what-didnt-work', title: "What didn't work", body: fm.what_didnt_work },
+  { n: '04', id: 'outcomes', title: 'Outcomes', body: fm.outcomes },
+];
+---
+
+<BaseLayout title={`${fm.title} · Guru Balamurugan`} description={fm.one_line_pitch}>
+  <a href="#case" class="skip-link">Skip to the case study</a>
+
+  <header class="site-nav">
+    <a class="identity" href="/" aria-label="Guru Balamurugan, home">
+      <span class="identity-name">Guru Balamurugan</span>
+      <span class="identity-sep" aria-hidden="true">·</span>
+      <span class="identity-role">AI Engineer</span>
+    </a>
+
+    <nav class="primary-nav" aria-label="Primary">
+      <a href="/#studio">Projects</a>
+      <a href="/resume">Resume</a>
+      <a href="/about">About</a>
+      <a href="/contact">Contact</a>
+    </nav>
+  </header>
+
+  <main>
+    <article id="case" class="case-study" aria-labelledby="case-title">
+      <a class="back-link" href="/#studio">
+        <span aria-hidden="true">←</span> Back to projects
+      </a>
+
+      <header class="case-head">
+        <p class="case-eyebrow">
+          <span class="case-status">{fm.status}</span>
+          <span class="case-sep" aria-hidden="true">/</span>
+          <span class="case-hero">{fm.hero_object}</span>
+        </p>
+
+        <h1 id="case-title" class="case-title">{fm.title}</h1>
+
+        <p class="case-pitch">{fm.one_line_pitch}</p>
+
+        <dl class="case-meta">
+          <div class="case-meta-row">
+            <dt>Role</dt>
+            <dd>{fm.role}</dd>
+          </div>
+          <div class="case-meta-row">
+            <dt>Timeline</dt>
+            <dd>{fm.timeline}</dd>
+          </div>
+          {fm.tech_stack.length > 0 && (
+            <div class="case-meta-row">
+              <dt>Stack</dt>
+              <dd>
+                {fm.tech_stack.map((t, i) => (
+                  <>
+                    {i > 0 && <span class="meta-sep" aria-hidden="true"> · </span>}
+                    <span>{t}</span>
+                  </>
+                ))}
+              </dd>
+            </div>
+          )}
+          {fm.github_url && (
+            <div class="case-meta-row">
+              <dt>Code</dt>
+              <dd>
+                <a class="meta-link" href={fm.github_url} rel="noreferrer">GitHub →</a>
+              </dd>
+            </div>
+          )}
+          {fm.demo_url && (
+            <div class="case-meta-row">
+              <dt>Demo</dt>
+              <dd>
+                <a class="meta-link" href={fm.demo_url} rel="noreferrer">Live demo →</a>
+              </dd>
+            </div>
+          )}
+        </dl>
+      </header>
+
+      {sections.map((s) => (
+        <section class={`case-section case-section--${s.id}`} id={s.id}>
+          <p class="case-num">
+            <span class="case-num-numeral">{s.n}</span>
+          </p>
+          <h2 class="case-h2">{s.title}</h2>
+          <div class="case-body">
+            {s.body.split(/\n\n+/).map((para) => (
+              <p>{para.trim()}</p>
+            ))}
+          </div>
+        </section>
+      ))}
+
+      {fm.build_logs.length > 0 && (
+        <section class="case-section" id="build-logs">
+          <p class="case-num">
+            <span class="case-num-numeral">{String(sections.length + 1).padStart(2, '0')}</span>
+          </p>
+          <h2 class="case-h2">Build log</h2>
+          <ol class="build-log" role="list">
+            {fm.build_logs.map((log) => (
+              <li class="build-log-item">
+                <time class="build-log-date" datetime={log.date}>{log.date}</time>
+                <a class="build-log-link" href={log.url} rel="noreferrer">{log.title}</a>
+                {log.summary && <p class="build-log-summary">{log.summary}</p>}
+              </li>
+            ))}
+          </ol>
+        </section>
+      )}
+
+      {fm.blogs.length > 0 && (
+        <section class="case-section" id="writing">
+          <p class="case-num">
+            <span class="case-num-numeral">
+              {String(sections.length + (fm.build_logs.length > 0 ? 2 : 1)).padStart(2, '0')}
+            </span>
+          </p>
+          <h2 class="case-h2">Writing</h2>
+          <ul class="case-blogs" role="list">
+            {fm.blogs.map((b) => (
+              <li>
+                <time class="case-blog-date" datetime={b.date}>{b.date}</time>
+                <a class="case-blog-link" href={b.url} rel="noreferrer">{b.title}</a>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
+      {fm.embedded_media.length > 0 && (
+        <section class="case-section" id="media">
+          <p class="case-num">
+            <span class="case-num-numeral">
+              {String(
+                sections.length + (fm.build_logs.length > 0 ? 1 : 0) + (fm.blogs.length > 0 ? 1 : 0) + 1
+              ).padStart(2, '0')}
+            </span>
+          </p>
+          <h2 class="case-h2">Walkthroughs</h2>
+          <ul class="case-media" role="list">
+            {fm.embedded_media.map((m) => (
+              <li class="case-media-item">
+                <p class="case-media-meta">{m.type}</p>
+                <a class="case-media-link" href={m.url} rel="noreferrer">
+                  {m.caption ?? m.url}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
+      <div class="case-mdx"><Content /></div>
+
+      <footer class="case-foot">
+        <a class="back-link" href="/#studio">
+          <span aria-hidden="true">←</span> Back to projects
+        </a>
+      </footer>
+    </article>
+  </main>
+
+  <footer class="page-footer">
+    <p class="footer-line">The work, lit and labeled.</p>
+    <ul class="footer-links" role="list">
+      <li><a href="https://github.com/" rel="me noreferrer">GitHub</a></li>
+      <li><a href="https://www.linkedin.com/" rel="me noreferrer">LinkedIn</a></li>
+      <li><a href="/about">About</a></li>
+      <li><a href="/contact">Contact</a></li>
+    </ul>
+    <p class="footer-meta">Astro · Cloudflare Pages · open source · 2026</p>
+  </footer>
+</BaseLayout>
+
+<style>
+  /* ============================================================
+   * Skip link
+   * ============================================================ */
+  .skip-link {
+    position: absolute;
+    left: var(--container-edge);
+    top: var(--container-edge);
+    padding: var(--space-snug) var(--space-base);
+    background: var(--surface-raised);
+    color: var(--key-light);
+    border: 1px solid var(--border-key);
+    border-radius: 2px;
+    z-index: 300;
+    transform: translateY(-200%);
+    transition: transform var(--dur-quick) var(--ease-focus-pull);
+  }
+  .skip-link:focus-visible {
+    transform: translateY(0);
+  }
+
+  /* ============================================================
+   * Shell
+   * ============================================================ */
+  .site-nav,
+  .case-study,
+  .page-footer {
+    width: 100%;
+    max-width: var(--container-wide);
+    margin-inline: auto;
+    padding-inline: var(--container-edge);
+  }
+
+  /* ============================================================
+   * Site header — same identity/nav as the home, not overlaid
+   * ============================================================ */
+  .site-nav {
+    padding-top: var(--space-roomy);
+    padding-bottom: var(--space-roomy);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-loose);
+    flex-wrap: wrap;
+  }
+
+  .identity {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.55ch;
+    text-decoration: none;
+    color: inherit;
+    font-family: var(--font-mono);
+    text-transform: uppercase;
+    letter-spacing: var(--ls-meta-allcaps);
+  }
+  .identity-name {
+    font-size: var(--fs-small);
+    font-weight: 500;
+    color: var(--ink-strong);
+  }
+  .identity-sep {
+    color: var(--key-light);
+    font-size: var(--fs-small);
+  }
+  .identity-role {
+    font-size: var(--fs-small);
+    color: var(--key-light);
+    font-weight: 500;
+  }
+
+  .primary-nav {
+    display: flex;
+    gap: var(--space-roomy);
+    flex-wrap: wrap;
+  }
+  .primary-nav a {
+    font-family: var(--font-body);
+    font-size: var(--fs-body);
+    color: var(--ink-strong);
+    text-decoration: none;
+    padding: var(--space-tight) 0;
+    border-bottom: 1px solid transparent;
+    transition:
+      color var(--dur-quick) var(--ease-focus-pull),
+      border-color var(--dur-quick) var(--ease-focus-pull);
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+  }
+  .primary-nav a:hover,
+  .primary-nav a:focus-visible {
+    color: var(--key-light);
+    border-bottom-color: var(--key-light);
+  }
+  .primary-nav a:focus-visible {
+    outline: 2px solid var(--key-light);
+    outline-offset: 4px;
+  }
+
+  /* ============================================================
+   * Case study shell
+   * ============================================================ */
+  .case-study {
+    padding-top: var(--space-loose);
+    padding-bottom: var(--space-vast);
+  }
+
+  .back-link {
+    font-family: var(--font-mono);
+    font-size: var(--fs-caption);
+    color: var(--ink-muted);
+    text-decoration: none;
+    text-transform: uppercase;
+    letter-spacing: var(--ls-meta-allcaps);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5ch;
+    padding: var(--space-tight) 0;
+    border-bottom: 1px solid transparent;
+    transition:
+      color var(--dur-quick) var(--ease-focus-pull),
+      border-color var(--dur-quick) var(--ease-focus-pull);
+  }
+  .back-link:hover,
+  .back-link:focus-visible {
+    color: var(--key-light);
+    border-bottom-color: var(--key-light);
+  }
+  .back-link:focus-visible {
+    outline: 2px solid var(--key-light);
+    outline-offset: 4px;
+  }
+
+  /* ============================================================
+   * Hero / head
+   * ============================================================ */
+  .case-head {
+    margin-top: var(--space-spacious);
+    margin-bottom: var(--space-vast);
+    max-width: 56rem;
+  }
+
+  .case-eyebrow {
+    font-family: var(--font-mono);
+    font-size: var(--fs-caption);
+    color: var(--ink-faint);
+    letter-spacing: var(--ls-meta-allcaps);
+    text-transform: uppercase;
+    margin: 0 0 var(--space-base);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6ch;
+  }
+  .case-status {
+    color: var(--key-light);
+  }
+  .case-sep {
+    color: var(--ink-faint);
+  }
+
+  .case-title {
+    font-family: var(--font-display);
+    font-size: var(--fs-display);
+    font-weight: 600;
+    line-height: 1.02;
+    letter-spacing: var(--ls-display);
+    color: var(--ink-strong);
+    margin: 0;
+    max-width: 18ch;
+    text-wrap: balance;
+  }
+
+  .case-pitch {
+    margin: var(--space-loose) 0 0;
+    max-width: 56ch;
+    color: var(--ink);
+    font-family: var(--font-body);
+    font-size: var(--fs-body-lg);
+    line-height: 1.5;
+  }
+
+  .case-meta {
+    margin: var(--space-spacious) 0 0;
+    padding: var(--space-loose) 0 0;
+    border-top: 1px solid var(--border-hairline);
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+    gap: var(--space-loose) var(--space-roomy);
+  }
+  .case-meta-row {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-hairline);
+  }
+  .case-meta-row dt {
+    font-family: var(--font-mono);
+    font-size: var(--fs-caption);
+    color: var(--ink-faint);
+    text-transform: uppercase;
+    letter-spacing: var(--ls-meta-allcaps);
+  }
+  .case-meta-row dd {
+    margin: 0;
+    font-family: var(--font-body);
+    font-size: var(--fs-body);
+    color: var(--ink);
+  }
+  .meta-sep {
+    color: var(--ink-faint);
+  }
+  .meta-link {
+    color: var(--key-light);
+    text-decoration: none;
+    border-bottom: 1px solid currentColor;
+    padding-bottom: 1px;
+    transition: color var(--dur-quick) var(--ease-focus-pull);
+  }
+  .meta-link:hover,
+  .meta-link:focus-visible {
+    color: var(--ink-strong);
+  }
+  .meta-link:focus-visible {
+    outline: 2px solid var(--key-light);
+    outline-offset: 4px;
+    border-color: transparent;
+  }
+
+  /* ============================================================
+   * Sections — numeral + heading + body
+   * ============================================================ */
+  .case-section {
+    margin-bottom: var(--space-vast);
+    scroll-margin-top: 6vh;
+  }
+
+  .case-num {
+    margin: 0 0 var(--space-snug);
+    font-family: var(--font-mono);
+    color: var(--key-light);
+  }
+  .case-num-numeral {
+    font-size: var(--fs-body);
+    font-weight: 500;
+    letter-spacing: var(--ls-caption);
+  }
+
+  .case-h2 {
+    font-family: var(--font-display);
+    font-size: var(--fs-h2);
+    font-weight: 600;
+    line-height: var(--lh-heading);
+    letter-spacing: var(--ls-heading);
+    color: var(--ink-strong);
+    margin: 0 0 var(--space-loose);
+    text-wrap: balance;
+  }
+
+  .case-body {
+    color: var(--ink);
+    font-family: var(--font-body);
+    font-size: var(--fs-body-lg);
+    line-height: var(--lh-body);
+    max-width: 68ch;
+  }
+  .case-body p {
+    margin: 0 0 var(--space-base);
+  }
+  .case-body p:last-child {
+    margin-bottom: 0;
+  }
+
+  /* Per-section numeral accent — same rotation as home risks plates
+     (key, key-soft, rim, key) so visual identity carries across pages. */
+  .case-section--problem .case-num,
+  .case-section--outcomes .case-num {
+    color: var(--key-light);
+  }
+  .case-section--approach .case-num {
+    color: var(--key-light-soft);
+  }
+  .case-section--what-didnt-work .case-num {
+    color: var(--rim-light);
+  }
+
+  /* ============================================================
+   * Build log
+   * ============================================================ */
+  .build-log {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    max-width: 68ch;
+  }
+  .build-log-item {
+    padding: var(--space-loose) 0;
+    border-top: 1px solid var(--border-hairline);
+    display: grid;
+    grid-template-columns: 8rem 1fr;
+    gap: var(--space-loose);
+    align-items: baseline;
+  }
+  .build-log-item:last-child {
+    border-bottom: 1px solid var(--border-hairline);
+  }
+  .build-log-date {
+    font-family: var(--font-mono);
+    font-size: var(--fs-caption);
+    color: var(--ink-faint);
+    letter-spacing: var(--ls-caption);
+  }
+  .build-log-link {
+    font-family: var(--font-body);
+    font-size: var(--fs-body);
+    font-weight: 500;
+    color: var(--ink-strong);
+    text-decoration: none;
+    border-bottom: 1px solid var(--border-hairline);
+    padding-bottom: 1px;
+    transition: border-color var(--dur-quick) var(--ease-focus-pull);
+  }
+  .build-log-link:hover,
+  .build-log-link:focus-visible {
+    border-bottom-color: var(--key-light);
+  }
+  .build-log-link:focus-visible {
+    outline: 2px solid var(--key-light);
+    outline-offset: 4px;
+    border-color: transparent;
+  }
+  .build-log-summary {
+    grid-column: 2;
+    margin: var(--space-tight) 0 0;
+    color: var(--ink-muted);
+    font-size: var(--fs-small);
+    line-height: 1.5;
+  }
+
+  /* ============================================================
+   * Blogs + media — sibling lists, lighter weight than build-log
+   * ============================================================ */
+  .case-blogs,
+  .case-media {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    max-width: 68ch;
+  }
+  .case-blogs li,
+  .case-media-item {
+    padding: var(--space-base) 0;
+    border-top: 1px solid var(--border-hairline);
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--space-base);
+  }
+  .case-blogs li:last-child,
+  .case-media-item:last-child {
+    border-bottom: 1px solid var(--border-hairline);
+  }
+  .case-blog-date,
+  .case-media-meta {
+    font-family: var(--font-mono);
+    font-size: var(--fs-caption);
+    color: var(--ink-faint);
+    letter-spacing: var(--ls-meta-allcaps);
+    text-transform: uppercase;
+    min-width: 6rem;
+  }
+  .case-blog-link,
+  .case-media-link {
+    font-family: var(--font-body);
+    font-size: var(--fs-body);
+    color: var(--ink-strong);
+    text-decoration: none;
+    border-bottom: 1px solid var(--border-hairline);
+    transition: border-color var(--dur-quick) var(--ease-focus-pull);
+  }
+  .case-blog-link:hover,
+  .case-blog-link:focus-visible,
+  .case-media-link:hover,
+  .case-media-link:focus-visible {
+    border-bottom-color: var(--key-light);
+  }
+  .case-blog-link:focus-visible,
+  .case-media-link:focus-visible {
+    outline: 2px solid var(--key-light);
+    outline-offset: 4px;
+    border-color: transparent;
+  }
+
+  /* ============================================================
+   * MDX body slot — for anything not in a required section
+   * ============================================================ */
+  .case-mdx {
+    max-width: 68ch;
+    color: var(--ink);
+    font-family: var(--font-body);
+    font-size: var(--fs-body-lg);
+    line-height: var(--lh-body);
+  }
+  .case-mdx :global(p) {
+    margin: 0 0 var(--space-base);
+  }
+  .case-mdx :global(h2),
+  .case-mdx :global(h3) {
+    font-family: var(--font-display);
+    color: var(--ink-strong);
+    margin-top: var(--space-spacious);
+    text-wrap: balance;
+  }
+  .case-mdx :global(h2) {
+    font-size: var(--fs-h2);
+    letter-spacing: var(--ls-heading);
+    line-height: var(--lh-heading);
+  }
+  .case-mdx :global(h3) {
+    font-size: var(--fs-h3);
+    letter-spacing: var(--ls-heading);
+    line-height: var(--lh-heading);
+  }
+  .case-mdx :global(a) {
+    color: var(--key-light);
+    text-decoration: none;
+    border-bottom: 1px solid currentColor;
+    padding-bottom: 1px;
+  }
+  .case-mdx :global(a:hover),
+  .case-mdx :global(a:focus-visible) {
+    color: var(--ink-strong);
+  }
+  .case-mdx :global(code) {
+    font-family: var(--font-mono);
+    font-size: 0.9em;
+    color: var(--key-light);
+    background: var(--surface-sunken);
+    padding: 0.1em 0.4em;
+    border-radius: 2px;
+  }
+  .case-mdx :global(pre) {
+    background: var(--surface-sunken);
+    border: 1px solid var(--border-hairline);
+    border-radius: 3px;
+    padding: var(--space-base);
+    overflow-x: auto;
+    font-size: var(--fs-small);
+  }
+  .case-mdx :global(blockquote) {
+    margin: var(--space-loose) 0;
+    padding-left: var(--space-loose);
+    border-left: 1px solid var(--key-light);
+    color: var(--ink-muted);
+    font-style: italic;
+  }
+
+  /* ============================================================
+   * Foot
+   * ============================================================ */
+  .case-foot {
+    margin-top: var(--space-vast);
+    padding-top: var(--space-loose);
+    border-top: 1px solid var(--border-hairline);
+  }
+
+  /* ============================================================
+   * Page footer
+   * ============================================================ */
+  .page-footer {
+    padding-top: var(--space-spacious);
+    padding-bottom: var(--space-roomy);
+    border-top: 1px solid var(--border-hairline);
+    margin-top: var(--space-roomy);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-base);
+    text-align: center;
+  }
+  .footer-line {
+    margin: 0;
+    color: var(--ink-muted);
+    font-size: var(--fs-body);
+  }
+  .footer-links {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--space-loose);
+  }
+  .footer-links a {
+    font-family: var(--font-body);
+    font-size: var(--fs-small);
+    color: var(--ink-muted);
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+    transition:
+      color var(--dur-quick) var(--ease-focus-pull),
+      border-color var(--dur-quick) var(--ease-focus-pull);
+  }
+  .footer-links a:hover,
+  .footer-links a:focus-visible {
+    color: var(--key-light);
+    border-bottom-color: var(--key-light);
+  }
+  .footer-meta {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: var(--fs-caption);
+    color: var(--ink-faint);
+    letter-spacing: 0.02em;
+  }
+
+  /* ============================================================
+   * Responsive
+   * ============================================================ */
+  @media (max-width: 640px) {
+    .case-meta {
+      grid-template-columns: 1fr;
+      gap: var(--space-base);
+    }
+    .build-log-item {
+      grid-template-columns: 1fr;
+      gap: var(--space-tight);
+    }
+    .build-log-summary {
+      grid-column: 1;
+    }
+    .case-blogs li,
+    .case-media-item {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: var(--space-tight);
+    }
+  }
+</style>
