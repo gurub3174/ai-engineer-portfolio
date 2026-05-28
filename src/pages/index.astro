@@ -1,10 +1,12 @@
 ---
-import BaseLayout from '@layouts/BaseLayout.astro';
-import { Picture } from 'astro:assets';
+import { Picture, getImage } from 'astro:assets';
+import homeBgPortrait from '@/assets/home-bg-portrait.png';
 import homeBg from '@/assets/home-bg-wide.png';
 import homeBinder from '@/assets/home-binder.png';
-import homeMic from '@/assets/home-mic.png';
 import homeBulb from '@/assets/home-bulb.png';
+import homeMic from '@/assets/home-mic.png';
+import NavMenu from '@components/NavMenu.astro';
+import BaseLayout from '@layouts/BaseLayout.astro';
 
 /*
  * Home — Phase 2 (v11, wide background + 4-up risks).
@@ -33,16 +35,9 @@ const subjects = [
     tip: 'Layout-aware PDF extraction for PE capital-call notices. Hybrid rules + LLM cut a 6-hour manual process to 12 minutes with 0.4% line-item error.',
     role: 'hero',
     pos: { x: 72, y: 76, w: 20 },
-    capGap: '-2rem',
-  },
-  {
-    id: 'mic',
-    slug: 'podcast',
-    name: 'Podcast pipeline',
-    tip: 'Audio sampling pipeline. A 90-minute episode condensed into a 6-bullet research brief, validated against the source transcript.',
-    role: 'supporting',
-    pos: { x: 88, y: 74, w: 10 },
-    capGap: '1rem',
+    // Caption pulled 50px tighter to the image, whole subject nudged 50px down.
+    capGap: 'calc(-2rem - 50px)',
+    dy: 50,
   },
   {
     id: 'bulb',
@@ -52,6 +47,17 @@ const subjects = [
     role: 'supporting',
     pos: { x: 56, y: 76, w: 11 },
     capGap: '-1rem',
+    dy: 50,
+  },
+  {
+    id: 'mic',
+    slug: 'podcast',
+    name: 'Podcast pipeline',
+    tip: 'Audio sampling pipeline. A 90-minute episode condensed into a 6-bullet research brief, validated against the source transcript.',
+    role: 'supporting',
+    pos: { x: 88, y: 74, w: 10 },
+    capGap: '1rem',
+    dy: 70,
   },
 ];
 
@@ -61,50 +67,73 @@ const risks = [
     slug: 'bad-inputs',
     title: 'Bad inputs, bad context',
     body: 'The model gets incomplete, excessive, stale, or irrelevant context.',
-    techniques: [
-      'Clean ingestion',
-      'metadata design',
-      'retrieval testing',
-      'context filtering',
-    ],
+    techniques: ['Clean ingestion', 'metadata design', 'retrieval testing', 'context filtering'],
   },
   {
     n: '02',
     slug: 'untrusted-outputs',
     title: 'Untrusted outputs',
     body: 'Fluent answers can look correct before they are actually reliable.',
-    techniques: [
-      'Structured outputs',
-      'schema validation',
-      'confidence flags',
-      'business rules',
-    ],
+    techniques: ['Structured outputs', 'schema validation', 'confidence flags', 'business rules'],
   },
   {
     n: '03',
     slug: 'no-evaluation-loop',
     title: 'No evaluation loop',
     body: 'Without review, teams cannot measure drift, quality, or failure.',
-    techniques: [
-      'Eval sets',
-      'human review',
-      'approval states',
-      'audit trails',
-    ],
+    techniques: ['Eval sets', 'human review', 'approval states', 'audit trails'],
   },
   {
     n: '04',
     slug: 'silent-failure',
     title: 'Silent failure',
     body: 'Systems break quietly unless their behavior is observable.',
-    techniques: [
-      'Logging',
-      'monitoring',
-      'exception queues',
-      'feedback loops',
-    ],
+    techniques: ['Logging', 'monitoring', 'exception queues', 'feedback loops'],
   },
 ];
+
+/*
+ * Art-directed background: a different image per orientation. Astro's <Picture>
+ * can only emit one source image, so we build the <picture> by hand from
+ * getImage() (runs at build time, zero runtime cost). Portrait sources are
+ * listed first in the markup so the (max-width:640px) media query wins on phones.
+ */
+const bgFormats = ['avif', 'webp'] as const;
+
+const wideBg = Object.fromEntries(
+  await Promise.all(
+    bgFormats.map(async (format) => [
+      format,
+      await getImage({
+        src: homeBg,
+        format,
+        widths: [768, 1280, 1600, 2000, 2400],
+        quality: 80,
+      }),
+    ]),
+  ),
+);
+
+const portraitBg = Object.fromEntries(
+  await Promise.all(
+    bgFormats.map(async (format) => [
+      format,
+      await getImage({
+        src: homeBgPortrait,
+        format,
+        widths: [430, 640, 860, 1080],
+        quality: 72,
+      }),
+    ]),
+  ),
+);
+
+const bgFallback = await getImage({
+  src: homeBg,
+  format: 'jpg',
+  width: 1600,
+  quality: 80,
+});
 ---
 
 <BaseLayout
@@ -120,33 +149,50 @@ const risks = [
       aria-label="Studio shoot: three projects on a round wooden table"
     >
       <div class="scene">
-        <Picture
-          src={homeBg}
-          formats={['avif', 'webp']}
-          fallbackFormat="jpg"
-          widths={[768, 1280, 1600, 2000, 2400]}
-          sizes="100vw"
-          alt="Empty studio scene: a round wooden table on the right lit by a softbox on the left, against a deep warm cove background."
-          loading="eager"
-          fetchpriority="high"
-          quality={80}
-          pictureAttributes={{ class: 'scene-bg' }}
-        />
+        <picture class="scene-bg">
+          {/* Portrait sources first so phones match before the wide desktop crop. */}
+          <source
+            media="(max-width: 640px)"
+            type="image/avif"
+            srcset={portraitBg.avif.srcSet.attribute}
+            sizes="100vw"
+          />
+          <source
+            media="(max-width: 640px)"
+            type="image/webp"
+            srcset={portraitBg.webp.srcSet.attribute}
+            sizes="100vw"
+          />
+          <source type="image/avif" srcset={wideBg.avif.srcSet.attribute} sizes="100vw" />
+          <source type="image/webp" srcset={wideBg.webp.srcSet.attribute} sizes="100vw" />
+          <img
+            src={bgFallback.src}
+            width={bgFallback.attributes.width}
+            height={bgFallback.attributes.height}
+            alt="Empty studio scene: a round wooden table lit by a warm softbox against a deep warm cove background."
+            loading="eager"
+            fetchpriority="high"
+            decoding="async"
+          />
+        </picture>
 
         <div class="scene-tint" aria-hidden="true"></div>
 
         <header class="site-nav">
-          <a class="identity" href="/" aria-label="Guru Balamurugan, home">
-            <span class="identity-name">Guru Balamurugan</span>
-            <span class="identity-sep" aria-hidden="true">·</span>
-            <span class="identity-role">AI Engineer</span>
-          </a>
+          <div class="nav-left">
+            <a class="identity" href="/" aria-label="Guru Balamurugan, home">
+              <span class="identity-name">Guru Balamurugan</span>
+              <span class="identity-sep" aria-hidden="true">·</span>
+              <span class="identity-role">AI Engineer</span>
+            </a>
+            <NavMenu />
+          </div>
 
           <nav class="primary-nav" aria-label="Primary">
             <a href="#risks">Projects</a>
             <a href="/resume">Resume</a>
             <a href="/about">About</a>
-            <a href="/contact">Contact</a>
+            <a href="/about#get-in-touch">Contact</a>
           </nav>
         </header>
 
@@ -177,11 +223,12 @@ const risks = [
           </ul>
         </div>
 
-        <ol class="products" role="list">
+        <div class="carousel-frame">
+        <ol class="products" role="list" aria-label="Featured projects. On mobile, swipe or use arrow keys to browse.">
           {subjects.map((s) => (
             <li
               class={`product product--${s.id} ${s.role === 'hero' ? 'is-default' : ''}`}
-              style={`--px: ${s.pos.x}%; --py: ${s.pos.y}%; --pw: ${s.pos.w}%; --cap-gap: ${s.capGap};`}
+              style={`--px: ${s.pos.x}%; --py: ${s.pos.y}%; --pw: ${s.pos.w}%; --cap-gap: ${s.capGap}; --dy: ${s.dy ?? 0}px;`}
             >
               <a
                 class={`product-link product-link--${s.id}`}
@@ -195,7 +242,7 @@ const risks = [
                       formats={['avif', 'webp']}
                       fallbackFormat="png"
                       widths={[200, 320, 480, 640]}
-                      sizes="(min-width: 1280px) 320px, (min-width: 768px) 22vw, 28vw"
+                      sizes="(min-width: 1280px) 320px, (min-width: 768px) 22vw, 56vw"
                       alt=""
                       loading="eager"
                       quality={78}
@@ -207,7 +254,7 @@ const risks = [
                       formats={['avif', 'webp']}
                       fallbackFormat="png"
                       widths={[140, 220, 320]}
-                      sizes="(min-width: 1280px) 130px, (min-width: 768px) 9vw, 12vw"
+                      sizes="(min-width: 1280px) 130px, (min-width: 768px) 9vw, 44vw"
                       alt=""
                       loading="eager"
                       quality={78}
@@ -219,7 +266,7 @@ const risks = [
                       formats={['avif', 'webp']}
                       fallbackFormat="png"
                       widths={[140, 220, 320]}
-                      sizes="(min-width: 1280px) 140px, (min-width: 768px) 10vw, 14vw"
+                      sizes="(min-width: 1280px) 140px, (min-width: 768px) 10vw, 44vw"
                       alt=""
                       loading="eager"
                       quality={78}
@@ -240,6 +287,15 @@ const risks = [
             </li>
           ))}
         </ol>
+          <div class="carousel-foot" aria-hidden="true">
+            <span class="swipe-hint">‹ swipe ›</span>
+            <span class="carousel-dots" data-carousel-dots>
+              {subjects.map((_, i) => (
+                <span class={`dot ${i === 0 ? 'is-active' : ''}`} data-dot={i}></span>
+              ))}
+            </span>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -250,7 +306,14 @@ const risks = [
         </h2>
       </header>
 
-      <ol class="risk-grid" role="list">
+      <p class="risks-swipe" aria-hidden="true">‹ swipe ›</p>
+
+      <ol
+        class="risk-grid"
+        role="list"
+        tabindex="0"
+        aria-label="Production risks. On mobile, swipe or use arrow keys to browse."
+      >
         {risks.map((r) => (
           <li class={`risk risk--${r.slug}`}>
             <p class="risk-number">
@@ -277,18 +340,39 @@ const risks = [
   </main>
 
   <footer class="page-footer">
-    <p class="footer-line">
-      The work, lit and labeled. Case studies under each subject.
-    </p>
     <ul class="footer-links" role="list">
       <li><a href="https://github.com/" rel="me noreferrer">GitHub</a></li>
-      <li><a href="https://www.linkedin.com/" rel="me noreferrer">LinkedIn</a></li>
+      <li><a href="https://www.linkedin.com/in/guru17/" rel="me noreferrer">LinkedIn</a></li>
       <li><a href="/about">About</a></li>
-      <li><a href="/contact">Contact</a></li>
+      <li><a href="/about#get-in-touch">Contact</a></li>
     </ul>
     <p class="footer-meta">Astro · Cloudflare Pages · open source · 2026</p>
   </footer>
 </BaseLayout>
+
+<script>
+  // Progressive enhancement: light the dot for the card centered in the
+  // mobile carousel. Without JS the first dot stays active and the carousel
+  // still works (native scroll-snap). No-op where the dots are hidden.
+  const track = document.querySelector('.products');
+  const dotsWrap = document.querySelector('[data-carousel-dots]');
+  if (track && dotsWrap) {
+    const dots = Array.from(dotsWrap.querySelectorAll('.dot'));
+    const cards = Array.from(track.querySelectorAll('.product'));
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting && entry.intersectionRatio > 0.6) {
+            const i = cards.indexOf(entry.target);
+            dots.forEach((d, di) => d.classList.toggle('is-active', di === i));
+          }
+        }
+      },
+      { root: track, threshold: [0.6] },
+    );
+    cards.forEach((c) => io.observe(c));
+  }
+</script>
 
 <style>
   /* ============================================================
@@ -418,6 +502,12 @@ const risks = [
     flex-wrap: wrap;
   }
 
+  .nav-left {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-base);
+  }
+
   .identity {
     display: inline-flex;
     align-items: baseline;
@@ -526,7 +616,8 @@ const risks = [
   .subhead {
     margin: var(--space-loose) 0 0;
     max-width: 48ch;
-    color: var(--ink);
+    /* Warm off-white: not pure white, but bright enough to read over the bg. */
+    color: oklch(0.86 0.014 65);
     font-family: var(--font-body);
     font-size: var(--fs-body-lg);
     line-height: 1.5;
@@ -619,6 +710,19 @@ const risks = [
   /* ============================================================
    * Products — layered cutouts on the table (right side)
    * ============================================================ */
+  /* Desktop: the carousel-frame is layout-transparent so .products keeps
+     resolving its absolute position against .scene exactly as before.
+     At <=640px (mobile block) the frame becomes the carousel container. */
+  .carousel-frame {
+    display: contents;
+  }
+
+  /* Swipe affordances are mobile-only; hidden on desktop. */
+  .carousel-foot,
+  .risks-swipe {
+    display: none;
+  }
+
   .products {
     position: absolute;
     inset: 0;
@@ -633,7 +737,8 @@ const risks = [
     left: var(--px);
     top: var(--py);
     width: var(--pw);
-    transform: translate(-50%, -100%);
+    /* --dy nudges a subject (image + caption together) down by N px. */
+    transform: translate(-50%, calc(-100% + var(--dy, 0px)));
     margin: 0;
     padding: 0;
   }
@@ -1008,11 +1113,11 @@ const risks = [
   @keyframes rise-in {
     from {
       opacity: 0;
-      transform: translate(-50%, calc(-100% + 0.6rem));
+      transform: translate(-50%, calc(-100% + var(--dy, 0px) + 0.6rem));
     }
     to {
       opacity: 1;
-      transform: translate(-50%, -100%);
+      transform: translate(-50%, calc(-100% + var(--dy, 0px)));
     }
   }
 
@@ -1080,91 +1185,267 @@ const risks = [
   }
 
   @media (max-width: 640px) {
+    /* Portrait studio: near-full-screen hero, table anchored to the bottom. */
     .scene {
-      aspect-ratio: 4 / 5;
-      min-height: 540px;
+      aspect-ratio: auto;
+      min-height: 88vh;
+      min-height: 88svh;
+      max-height: none;
     }
 
-    /* Overlay stays absolute on the photograph; widen it for narrow viewports.
-       Tint stays — it's still doing contrast work behind the title. */
+    /* Push the image down 30px so the empty floor below the table is clipped
+       (crops the bottom ~30px without raising the framing). */
+    :global(.scene-bg img) {
+      object-position: center calc(100% + 30px);
+    }
+
+    /* Hero copy: upper-left, dropped ~25px below the sticky identity bar.
+       Wide enough that each title line ("AI that ships." / "Data that works.")
+       stays unbroken; vw-scaled so it never overflows narrow phones. */
     .scene-overlay {
-      width: 88%;
-      top: 16%;
+      width: min(94%, 27rem);
+      top: calc(9% + 25px);
       left: var(--container-edge);
     }
-
-    /* Reposition products for vertical scene */
-    .product--binder {
-      --px: 50%;
-      --py: 66%;
-      --pw: 38%;
-      --cap-gap: -2.5rem;
+    .title {
+      font-size: clamp(2.4rem, 10.5vw, 3.2rem);
     }
-    .product--mic {
-      --px: 78%;
-      --py: 82%;
-      --pw: 16%;
-      --cap-gap: 0.75rem;
+    .title-line {
+      white-space: nowrap;
     }
-    .product--bulb {
-      --px: 24%;
-      --py: 80%;
-      --pw: 20%;
-      --cap-gap: -1rem;
+    .subhead {
+      margin-top: var(--space-snug);
+      font-size: var(--fs-small);
+      line-height: 1.5;
+      max-width: 38ch;
+    }
+    /* Explore / Resume CTAs drop on mobile (nav lives in the dropdown). */
+    .cta-row {
+      display: none;
     }
 
-    .cutout-wrap {
-      filter: brightness(0.90) saturate(0.95);
+    /* Header sticks to the top while scrolling; horizontal nav collapses into
+       the NavMenu dropdown next to the identity. Scrim keeps it readable over
+       any content scrolled beneath it. */
+    .site-nav {
+      position: fixed;
+      z-index: 100;
+      padding: var(--space-base) var(--container-edge);
+      background: linear-gradient(
+        to bottom,
+        oklch(0.08 0.005 65 / 0.94) 0%,
+        oklch(0.08 0.005 65 / 0.72) 60%,
+        transparent 100%
+      );
     }
 
-    .product.is-default .cutout-wrap,
-    .products:has(.product-link--binder:hover) .product--binder .cutout-wrap,
-    .products:has(.product-link--binder:focus-visible) .product--binder .cutout-wrap,
-    .products:has(.product-link--mic:hover) .product--mic .cutout-wrap,
-    .products:has(.product-link--mic:focus-visible) .product--mic .cutout-wrap {
-      filter:
-        brightness(1.12)
-        saturate(1.06)
-        drop-shadow(0 0 18px oklch(0.74 0.155 65 / 0.40))
-        drop-shadow(6px 10px 12px oklch(0.04 0.003 65 / 0.45));
+    .primary-nav {
+      display: none;
     }
 
-    .products:has(.product-link--bulb:hover) .product--bulb .cutout-wrap,
-    .products:has(.product-link--bulb:focus-visible) .product--bulb .cutout-wrap {
-      filter:
-        brightness(1.30)
-        saturate(1.20)
-        drop-shadow(0 0 24px oklch(0.74 0.155 65 / 0.55))
-        drop-shadow(0 0 10px oklch(0.82 0.085 78 / 0.40))
-        drop-shadow(6px 10px 12px oklch(0.04 0.003 65 / 0.45));
+    /* ---- Products become a swipe carousel centered on the table ----
+       The carousel-frame (display:contents on desktop) becomes the real
+       container here; cards are a horizontal scroll-snap track. doc-extractor
+       (binder) is first in DOM so it rests dead-center via scroll-padding. */
+    .carousel-frame {
+      display: flex;
+      flex-direction: column;
+      position: absolute;
+      z-index: 3;
+      left: 0;
+      right: 0;
+      bottom: 4svh;
+      height: 46svh;
+      isolation: isolate;
     }
 
-    .products:has(.product-link--mic:hover) .product--binder .cutout-wrap,
-    .products:has(.product-link--mic:focus-visible) .product--binder .cutout-wrap,
-    .products:has(.product-link--bulb:hover) .product--binder .cutout-wrap,
-    .products:has(.product-link--bulb:focus-visible) .product--binder .cutout-wrap {
-      filter: brightness(0.90) saturate(0.95);
+    .products {
+      position: static;
+      inset: auto;
+      flex: 1 1 auto;
+      min-height: 0;
+      display: flex;
+      flex-wrap: nowrap;
+      align-items: end;
+      overflow-x: auto;
+      overflow-y: hidden;
+      scroll-snap-type: x mandatory;
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior-x: contain;
+      scrollbar-width: none;
+      gap: 6vw;
+      /* leading/trailing room so first (binder) + last cards reach center */
+      scroll-padding-inline: 19vw;
+      padding-inline: 19vw;
+    }
+    .products::-webkit-scrollbar {
+      display: none;
+    }
+
+    .product {
+      position: relative;
+      left: auto;
+      top: auto;
+      /* All three subjects lifted off the table baseline. */
+      transform: translateY(-50px);
+      width: auto;
+      flex: 0 0 62vw;
+      scroll-snap-align: center;
+      scroll-snap-stop: always; /* one card per swipe, no overshoot */
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      animation: none; /* rise-in animates a conflicting translate */
+    }
+
+    /* Uniform cutout; the fixed spotlight + edge dimmers carry the
+       center-sharp / edges-dim read (per-card live blur would need JS). */
+    .product .cutout-wrap,
+    .product.is-default .cutout-wrap {
+      filter: brightness(0.96) saturate(0.98);
+      transform: none;
+    }
+    /* Lightbulb sits high in its cutout; drop it 25px to close the gap to its
+       "AI design team" caption. */
+    .product--bulb .cutout-wrap {
+      transform: translateY(25px);
+    }
+    .cutout-wrap :global(img) {
+      width: auto;
+      height: auto;
+      max-width: 54vw;
+      max-height: 34vh;
+      margin-inline: auto;
+    }
+
+    /* Captions always visible on touch (no hover). White for contrast. */
+    .caption {
+      opacity: 1;
+      margin-top: var(--space-snug);
+    }
+    .name {
+      color: var(--ink-strong);
+    }
+
+    /* doc-extractor (hero): caption pulled 50px tighter to the binder image. */
+    .product--binder .caption {
+      margin-top: calc(var(--space-snug) - 50px);
+    }
+
+    /* Hover tooltip is a pointer affordance; drop it on touch. */
+    .tip {
+      display: none;
+    }
+
+    /* Fixed warm spotlight pool — cards swipe under it. */
+    .carousel-frame::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      z-index: 5;
+      pointer-events: none;
+      background: radial-gradient(
+        58% 70% at 50% 46%,
+        oklch(0.82 0.085 78 / 0.20) 0%,
+        transparent 62%
+      );
+      mix-blend-mode: screen;
+    }
+
+    /* Edge dimmers — peeking neighbours read dim/recessed. */
+    .carousel-frame::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      z-index: 6;
+      pointer-events: none;
+      background: linear-gradient(
+        to right,
+        oklch(0.05 0.005 65 / 0.80) 0%,
+        oklch(0.05 0.005 65 / 0.34) 15%,
+        transparent 33%,
+        transparent 67%,
+        oklch(0.05 0.005 65 / 0.34) 85%,
+        oklch(0.05 0.005 65 / 0.80) 100%
+      );
+    }
+
+    /* Swipe affordance + slide dots, sitting above the overlays. */
+    .carousel-foot {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-base);
+      position: relative;
+      z-index: 7;
+      flex: 0 0 auto;
+      padding-top: var(--space-snug);
+    }
+    .swipe-hint {
+      font-family: var(--font-mono);
+      font-size: var(--fs-caption);
+      letter-spacing: var(--ls-meta-allcaps);
+      text-transform: uppercase;
+      color: var(--ink-faint);
+    }
+    .carousel-dots {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--ink-faint);
+      opacity: 0.4;
+      transition: opacity var(--dur-quick) var(--ease-focus-pull),
+        background var(--dur-quick) var(--ease-focus-pull);
+    }
+    .dot.is-active {
+      background: var(--key-light);
+      opacity: 1;
+    }
+
+    /* Swipe hint above the risk cards (no dots). */
+    .risks-swipe {
+      display: block;
+      margin: 0 0 var(--space-snug);
+      font-family: var(--font-mono);
+      font-size: var(--fs-caption);
+      letter-spacing: var(--ls-meta-allcaps);
+      text-transform: uppercase;
+      color: var(--ink-faint);
+    }
+
+    /* Tighten the gap between the hero and the risks section. */
+    .risks {
+      padding-top: var(--space-base);
+    }
+
+    /* ---- Production risks become swipe cards (gentle proximity snap so
+       the four patterns stay scannable; next card peeks to signal swipe) ---- */
+    .risk-grid {
+      grid-template-columns: none;
+      display: flex;
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      gap: var(--space-base);
+      scroll-snap-type: x proximity;
+      scroll-padding-inline: var(--container-edge);
+      overscroll-behavior-x: contain;
+      scrollbar-width: none;
+    }
+    .risk-grid::-webkit-scrollbar {
+      display: none;
+    }
+    .risk {
+      flex: 0 0 80vw;
+      scroll-snap-align: start;
     }
 
     .footer-links {
       gap: var(--space-base);
-    }
-
-    .tip {
-      max-width: 18ch;
-      font-size: var(--fs-caption);
-    }
-
-    .risk-grid {
-      grid-template-columns: 1fr;
-    }
-
-    .primary-nav {
-      gap: var(--space-base);
-    }
-
-    .primary-nav a {
-      font-size: var(--fs-small);
     }
   }
 

@@ -1,0 +1,310 @@
+---
+import NavMenu from '@components/NavMenu.astro';
+import BaseLayout from '@layouts/BaseLayout.astro';
+
+/*
+ * Podcast pipeline — placeholder. A static route at /projects/podcast takes
+ * precedence over [slug].astro, so this renders instead of the case-study
+ * template until the writeup is ready.
+ */
+---
+
+<BaseLayout
+  title="Podcast pipeline · Guru Balamurugan"
+  description="Podcast pipeline case study, work in progress."
+  noindex={true}
+>
+  <a href="#wip" class="skip-link">Skip to content</a>
+
+  <header class="site-nav">
+    <div class="nav-left">
+      <a class="identity" href="/" aria-label="Guru Balamurugan, home">
+        <span class="identity-name">Guru Balamurugan</span>
+        <span class="identity-sep" aria-hidden="true">·</span>
+        <span class="identity-role">AI Engineer</span>
+      </a>
+      <NavMenu current="projects" />
+    </div>
+
+    <nav class="primary-nav" aria-label="Primary">
+      <a href="/#studio">Projects</a>
+      <a href="/resume">Resume</a>
+      <a href="/about">About</a>
+      <a href="/about#get-in-touch">Contact</a>
+    </nav>
+  </header>
+
+  <main id="wip" class="wip">
+    <a class="back-link" href="/#studio">
+      <span aria-hidden="true">←</span> Back to projects
+    </a>
+
+    <section class="wip-body" aria-labelledby="wip-title">
+      <p class="wip-eyebrow">Podcast pipeline</p>
+      <h1 id="wip-title" class="wip-title">Work in progress.</h1>
+      <p class="wip-text">
+        This case study is being written. The other two projects are ready to
+        read in the meantime.
+      </p>
+      <a class="wip-cta" href="/#studio">View the other projects</a>
+    </section>
+  </main>
+
+  <footer class="page-footer">
+    <ul class="footer-links" role="list">
+      <li><a href="https://github.com/" rel="me noreferrer">GitHub</a></li>
+      <li><a href="https://www.linkedin.com/in/guru17/" rel="me noreferrer">LinkedIn</a></li>
+      <li><a href="/about">About</a></li>
+      <li><a href="/about#get-in-touch">Contact</a></li>
+    </ul>
+    <p class="footer-meta">Astro · Cloudflare Pages · open source · 2026</p>
+  </footer>
+</BaseLayout>
+
+<style>
+  .skip-link {
+    position: absolute;
+    left: var(--container-edge);
+    top: var(--container-edge);
+    padding: var(--space-snug) var(--space-base);
+    background: var(--surface-raised);
+    color: var(--key-light);
+    border: 1px solid var(--border-key);
+    border-radius: 2px;
+    z-index: 300;
+    transform: translateY(-200%);
+    transition: transform var(--dur-quick) var(--ease-focus-pull);
+  }
+  .skip-link:focus-visible {
+    transform: translateY(0);
+  }
+
+  .site-nav,
+  .wip,
+  .page-footer {
+    width: 100%;
+    max-width: var(--container-wide);
+    margin-inline: auto;
+    padding-inline: var(--container-edge);
+  }
+
+  .site-nav {
+    padding-top: var(--space-roomy);
+    padding-bottom: var(--space-roomy);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-loose);
+    flex-wrap: wrap;
+  }
+
+  .nav-left {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-base);
+  }
+
+  .identity {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.55ch;
+    text-decoration: none;
+    color: inherit;
+    font-family: var(--font-mono);
+    text-transform: uppercase;
+    letter-spacing: var(--ls-meta-allcaps);
+  }
+  .identity-name {
+    font-size: var(--fs-small);
+    font-weight: 500;
+    color: var(--ink-strong);
+  }
+  .identity-sep {
+    color: var(--key-light);
+    font-size: var(--fs-small);
+  }
+  .identity-role {
+    font-size: var(--fs-small);
+    color: var(--key-light);
+    font-weight: 500;
+  }
+
+  .primary-nav {
+    display: flex;
+    gap: var(--space-roomy);
+    flex-wrap: wrap;
+  }
+  .primary-nav a {
+    font-family: var(--font-body);
+    font-size: var(--fs-body);
+    color: var(--ink-strong);
+    text-decoration: none;
+    padding: var(--space-tight) 0;
+    border-bottom: 1px solid transparent;
+    transition:
+      color var(--dur-quick) var(--ease-focus-pull),
+      border-color var(--dur-quick) var(--ease-focus-pull);
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+  }
+  .primary-nav a:hover,
+  .primary-nav a:focus-visible {
+    color: var(--key-light);
+    border-bottom-color: var(--key-light);
+  }
+  .primary-nav a:focus-visible {
+    outline: 2px solid var(--key-light);
+    outline-offset: 4px;
+  }
+
+  .wip {
+    padding-top: var(--space-loose);
+    padding-bottom: var(--space-vast);
+  }
+
+  .back-link {
+    font-family: var(--font-mono);
+    font-size: var(--fs-caption);
+    color: var(--ink-muted);
+    text-decoration: none;
+    text-transform: uppercase;
+    letter-spacing: var(--ls-meta-allcaps);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5ch;
+    padding: var(--space-tight) 0;
+    border-bottom: 1px solid transparent;
+    transition:
+      color var(--dur-quick) var(--ease-focus-pull),
+      border-color var(--dur-quick) var(--ease-focus-pull);
+  }
+  .back-link:hover,
+  .back-link:focus-visible {
+    color: var(--key-light);
+    border-bottom-color: var(--key-light);
+  }
+
+  .wip-body {
+    margin-top: var(--space-vast);
+    max-width: 56ch;
+  }
+
+  .wip-eyebrow {
+    font-family: var(--font-mono);
+    font-size: var(--fs-caption);
+    color: var(--ink-faint);
+    letter-spacing: var(--ls-meta-allcaps);
+    text-transform: uppercase;
+    margin: 0 0 var(--space-base);
+  }
+
+  .wip-title {
+    font-family: var(--font-display);
+    font-size: var(--fs-display);
+    font-weight: 600;
+    line-height: 1.02;
+    letter-spacing: var(--ls-display);
+    color: var(--ink-strong);
+    margin: 0;
+  }
+
+  .wip-text {
+    margin: var(--space-loose) 0 var(--space-roomy);
+    color: var(--ink);
+    font-family: var(--font-body);
+    font-size: var(--fs-body-lg);
+    line-height: 1.55;
+  }
+
+  .wip-cta {
+    font-family: var(--font-body);
+    font-size: var(--fs-body);
+    font-weight: 500;
+    color: var(--key-light);
+    text-decoration: none;
+    padding-bottom: 2px;
+    border-bottom: 1px solid currentColor;
+    transition:
+      color var(--dur-quick) var(--ease-focus-pull),
+      border-color var(--dur-quick) var(--ease-focus-pull);
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+  }
+  .wip-cta::after {
+    content: ' →';
+    margin-left: 0.3ch;
+    transition: transform var(--dur-quick) var(--ease-focus-pull);
+    display: inline-block;
+  }
+  .wip-cta:hover,
+  .wip-cta:focus-visible {
+    color: var(--ink-strong);
+    border-color: var(--ink-strong);
+  }
+  .wip-cta:hover::after,
+  .wip-cta:focus-visible::after {
+    transform: translateX(3px);
+  }
+
+  .page-footer {
+    padding-top: var(--space-spacious);
+    padding-bottom: var(--space-roomy);
+    border-top: 1px solid var(--border-hairline);
+    margin-top: var(--space-roomy);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-base);
+    text-align: center;
+  }
+  .footer-line {
+    margin: 0;
+    color: var(--ink-muted);
+    font-size: var(--fs-body);
+  }
+  .footer-links {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--space-loose);
+  }
+  .footer-links a {
+    font-family: var(--font-body);
+    font-size: var(--fs-small);
+    color: var(--ink-muted);
+    text-decoration: none;
+  }
+  .footer-meta {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: var(--fs-caption);
+    color: var(--ink-faint);
+    letter-spacing: 0.02em;
+  }
+
+  @media (max-width: 640px) {
+    .site-nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      padding-top: var(--space-base);
+      padding-bottom: var(--space-base);
+      background: var(--bg-stage);
+      border-bottom: 1px solid var(--border-hairline);
+    }
+    .primary-nav {
+      display: none;
+    }
+    .wip {
+      padding-top: var(--space-base);
+    }
+    .wip-body {
+      margin-top: var(--space-loose);
+    }
+  }
+</style>

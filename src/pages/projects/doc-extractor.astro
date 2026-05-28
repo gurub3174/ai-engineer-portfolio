@@ -1,0 +1,1015 @@
+---
+import NavMenu from '@components/NavMenu.astro';
+import BaseLayout from '@layouts/BaseLayout.astro';
+
+/*
+ * DocExtract case study — bespoke route. Static /projects/doc-extractor wins
+ * over [slug].astro, giving full control over the impact strip, the embedded
+ * architecture diagram, and the production-grade breakdown the standard
+ * four-section template can't hold.
+ */
+
+const metrics = [
+  { value: '~1 month → <1 week', label: 'Manual review cycle' },
+  { value: '50%+ smaller', label: 'Review team' },
+  { value: '91%', label: 'Evaluation accuracy vs test set' },
+  { value: '+1.4x cost', label: 'For stronger supervisor-worker extraction' },
+  { value: '$2-3M + >$1M', label: 'Vendor recs and internal build displaced' },
+];
+
+const steps = [
+  {
+    n: '01',
+    title: 'Layout-aware ingestion',
+    body: 'Documents are uploaded through the API and stored in S3. Docling and Python preprocessing convert PDFs into structured Markdown while preserving tables, spatial relationships, and layout cues. Capital-call notices are not just text: the meaning of a number often depends on where it sits on the page.',
+  },
+  {
+    n: '02',
+    title: 'Classification before extraction',
+    body: 'The system first labels each document by type and template/client. A smaller model such as Haiku handles lower-cost classification, so expensive extraction models are reserved for where they add value. Those labels also seed future fine-tuning, template-specific evaluation, and cheaper operations over time.',
+  },
+  {
+    n: '03',
+    title: 'Decomposed extraction',
+    body: 'Instead of one large prompt extracting everything at once, a supervisor-worker pattern in LangGraph splits the task into three focused groups: notice metadata; capital activity and financial amounts; dates, payment instructions, and operational fields. This raised accuracy while only increasing cost by about 1.4x, a better spot on the cost-accuracy frontier.',
+  },
+  {
+    n: '04',
+    title: 'Symbolic-neural validation',
+    body: 'LLMs handle messy interpretation; code handles deterministic truth. After extraction, structured outputs pass through Pydantic schemas, Bedrock JSON schema enforcement, coded business rules, math checks, and reconciliation logic. The core design principle: the model extracts, the system verifies.',
+  },
+  {
+    n: '05',
+    title: 'Provenance by default',
+    body: 'Every extracted value is stored with provenance markers, such as bounding-box coordinates or exact text spans, so a reviewer can trace any number back to its place in the original document. That makes the output auditable rather than merely plausible.',
+  },
+  {
+    n: '06',
+    title: 'HITL review and correction logging',
+    body: 'Low-confidence or failed validations route to human review. Corrections are stored immutably alongside the original prediction, the corrected value, and a reason code, creating a feedback loop for evaluation, prompt improvement, template tuning, and future fine-tuning.',
+  },
+];
+
+const grade = [
+  {
+    title: 'Governed outputs',
+    body: 'Typed JSON schemas, Pydantic validation, Bedrock schema enforcement, and required provenance fields cut hallucination risk and keep every output reviewable.',
+  },
+  {
+    title: 'Deterministic checks',
+    body: 'Business rules, math validation, and reconciliation logic verify the fields the model should not be trusted to reason through on its own.',
+  },
+  {
+    title: 'Cost discipline',
+    body: 'Smaller models handle classification where possible; larger models are reserved for high-value extraction. The supervisor-worker design improved accuracy at only a 1.4x cost increase.',
+  },
+  {
+    title: 'Observability',
+    body: 'Phoenix, structured logs, model metadata, prompt versions, latency, and extraction events make failures diagnosable instead of invisible.',
+  },
+  {
+    title: 'Human-in-the-loop review',
+    body: 'The system does not assume full automation on day one. Low-confidence extractions route to review, and corrections become training and evaluation assets.',
+  },
+  {
+    title: 'Reproducibility',
+    body: 'SQLite checkpointing, immutable extraction events, prompt configs, model versions, and file hashes let the pipeline resume, replay, and audit past runs.',
+  },
+];
+
+const retrieval = [
+  'Dense vector search for semantic matches',
+  'Sparse keyword search for exact identifiers, amounts, and fund names',
+  'Reciprocal rank fusion for candidate selection',
+  'Reranking for final precision before extraction',
+];
+
+const stack = [
+  { k: 'Backend / orchestration', v: 'FastAPI, Docker, LangGraph, SQLite checkpointer' },
+  { k: 'Document storage', v: 'AWS S3' },
+  { k: 'Parsing', v: 'Docling, Python preprocessing, layout-aware Markdown' },
+  { k: 'Models', v: 'AWS Bedrock, Claude Sonnet, Claude Haiku / SLM classification' },
+  { k: 'Validation', v: 'Pydantic, Bedrock JSON schemas, deterministic business rules' },
+  { k: 'Retrieval / storage', v: 'Postgres, pgvector, JSONB, hierarchical chunks' },
+  { k: 'LLMOps', v: 'Phoenix, structlog, extraction event telemetry' },
+  { k: 'Migrations', v: 'Alembic' },
+  { k: 'Review loop', v: 'HITL correction ledger, reason codes, confidence gates' },
+];
+
+const evidence = [
+  'Original file hash',
+  'Parsed chunks',
+  'Model configuration',
+  'Extraction event',
+  'Structured result',
+  'Provenance markers',
+  'Human corrections',
+];
+---
+
+<BaseLayout
+  title="Document extractor · Guru Balamurugan"
+  description="DocExtract: production-grade financial document extraction. Layout-aware parsing, decomposed LLM extraction, deterministic validation, provenance, and human-in-the-loop review for private-equity PDFs."
+>
+  <a href="#case" class="skip-link">Skip to the case study</a>
+
+  <header class="site-nav">
+    <div class="nav-left">
+      <a class="identity" href="/" aria-label="Guru Balamurugan, home">
+        <span class="identity-name">Guru Balamurugan</span>
+        <span class="identity-sep" aria-hidden="true">·</span>
+        <span class="identity-role">AI Engineer</span>
+      </a>
+      <NavMenu current="projects" />
+    </div>
+
+    <nav class="primary-nav" aria-label="Primary">
+      <a href="/#studio">Projects</a>
+      <a href="/resume">Resume</a>
+      <a href="/about">About</a>
+      <a href="/about#get-in-touch">Contact</a>
+    </nav>
+  </header>
+
+  <main>
+    <article id="case" class="case" aria-labelledby="case-title">
+      <a class="back-link" href="/#studio">
+        <span aria-hidden="true">←</span> Back to projects
+      </a>
+
+      <header class="case-head">
+        <p class="case-eyebrow">
+          <span class="case-status">In production</span>
+          <span class="case-sep" aria-hidden="true">/</span>
+          <span>Document extraction</span>
+        </p>
+
+        <h1 id="case-title" class="case-title">
+          Production-grade financial document extraction
+        </h1>
+
+        <p class="case-pitch">
+          DocExtract turns messy private-equity PDFs into structured, auditable
+          data. It combines layout-aware parsing, LLM classification, decomposed
+          extraction, deterministic validation, RAG, observability, and
+          human-in-the-loop review so financial operations teams can move from
+          manual document review to governed automation.
+        </p>
+
+        <p class="case-built">
+          Built for capital calls, distribution notices, and other
+          private-market documents with inconsistent templates, sparse public
+          data, and high accuracy requirements.
+        </p>
+
+        <div class="case-actions">
+          <a class="cta cta--primary" href="#architecture">View architecture diagram</a>
+        </div>
+
+        <dl class="case-meta">
+          <div class="case-meta-row">
+            <dt>Role</dt>
+            <dd>Sole AI engineer: design, build, evaluation</dd>
+          </div>
+          <div class="case-meta-row">
+            <dt>Domain</dt>
+            <dd>Private-market fund operations</dd>
+          </div>
+          <div class="case-meta-row">
+            <dt>Core stack</dt>
+            <dd>FastAPI · LangGraph · AWS Bedrock · Docling · Pydantic · Postgres/pgvector · Phoenix</dd>
+          </div>
+        </dl>
+      </header>
+
+      <!-- Impact strip -->
+      <section class="impact" aria-labelledby="impact-title">
+        <h2 id="impact-title" class="section-title">Impact</h2>
+        <ol class="metrics" role="list">
+          {metrics.map((m) => (
+            <li class="metric">
+              <p class="metric-value">{m.value}</p>
+              <p class="metric-label">{m.label}</p>
+            </li>
+          ))}
+        </ol>
+        <p class="impact-note">
+          Metrics reflect internal evaluation and projected operational impact
+          from the implemented workflow.
+        </p>
+      </section>
+
+      <!-- Problem -->
+      <section class="block" aria-labelledby="problem-title">
+        <p class="block-num"><span>01</span></p>
+        <h2 id="problem-title" class="block-title">The problem</h2>
+        <div class="prose">
+          <p>
+            Private-market documents are not clean forms. They are visual,
+            template-heavy PDFs where the values that matter are buried in
+            tables, footnotes, legal language, and client-specific layouts.
+          </p>
+          <p>
+            A normal PDF → LLM → JSON pipeline breaks down because it cannot
+            reliably answer five questions:
+          </p>
+          <ul class="q-list">
+            <li>Where did this number come from?</li>
+            <li>Was the math checked?</li>
+            <li>Which model and prompt produced this result?</li>
+            <li>Should this output be auto-approved or sent to review?</li>
+            <li>Can a human correction improve the next run?</li>
+          </ul>
+          <p>DocExtract was designed around those failure modes.</p>
+        </div>
+      </section>
+
+      <!-- Architecture diagram -->
+      <section class="block" id="architecture" aria-labelledby="arch-title">
+        <p class="block-num"><span>02</span></p>
+        <h2 id="arch-title" class="block-title">System architecture</h2>
+        <p class="prose-lede">
+          Upload to extraction to governed storage. Classification and a RAG
+          layer feed a supervisor-worker orchestrator; every output runs the
+          validation and confidence gate before it can be committed.
+        </p>
+        <figure class="diagram">
+          <div
+            class="diagram-scroll"
+            tabindex="0"
+            role="group"
+            aria-label="DocExtract architecture diagram, scroll horizontally to view"
+          >
+            <img
+              src="/diagrams/doc-extractor-architecture.png"
+              alt="DocExtract pipeline: PDF upload to S3, Docling preprocessing into layout-aware Markdown, classification with Haiku/SLM and a hierarchical-chunk RAG layer feeding a LangGraph supervisor-worker orchestrator with three workers (notice metadata; capital activity and amounts; dates and payment instructions), structured JSON output validated by Pydantic and Bedrock schemas, a deterministic validation stage, a confidence and quality gate that either approves and commits to Postgres/pgvector or routes to re-extraction and HITL review with a correction ledger, plus Phoenix and structlog observability."
+              loading="lazy"
+              width="1832"
+              height="320"
+            />
+          </div>
+          <figcaption class="diagram-cap">
+            <a href="/diagrams/doc-extractor-architecture.png" target="_blank" rel="noopener">
+              View full size →
+            </a>
+          </figcaption>
+        </figure>
+      </section>
+
+      <!-- How it works -->
+      <section class="block" aria-labelledby="how-title">
+        <p class="block-num"><span>03</span></p>
+        <h2 id="how-title" class="block-title">How it works</h2>
+        <ol class="steps" role="list">
+          {steps.map((s) => (
+            <li class="step">
+              <p class="step-num">{s.n}</p>
+              <div class="step-body">
+                <h3 class="step-title">{s.title}</h3>
+                <p>{s.body}</p>
+              </div>
+            </li>
+          ))}
+        </ol>
+        <blockquote class="principle">The model extracts. The system verifies.</blockquote>
+      </section>
+
+      <!-- Production-grade -->
+      <section class="block" aria-labelledby="grade-title">
+        <p class="block-num"><span>04</span></p>
+        <h2 id="grade-title" class="block-title">What makes this production-grade</h2>
+        <ol class="grade" role="list">
+          {grade.map((g) => (
+            <li class="grade-item">
+              <h3 class="grade-title">{g.title}</h3>
+              <p>{g.body}</p>
+            </li>
+          ))}
+        </ol>
+      </section>
+
+      <!-- Data model -->
+      <section class="block" aria-labelledby="data-title">
+        <p class="block-num"><span>05</span></p>
+        <h2 id="data-title" class="block-title">Data model</h2>
+        <div class="prose">
+          <p>
+            DocExtract stores more than the final JSON. It keeps the evidence
+            trail behind each output, so the system can answer not only "what
+            did we extract?" but also "why should we trust it?"
+          </p>
+        </div>
+        <ol class="evidence" role="list">
+          {evidence.map((e, i) => (
+            <li class="evidence-item">
+              <span class="evidence-num">{String(i + 1).padStart(2, '0')}</span>
+              <span>{e}</span>
+            </li>
+          ))}
+        </ol>
+      </section>
+
+      <!-- Retrieval -->
+      <section class="block" aria-labelledby="retrieval-title">
+        <p class="block-num"><span>06</span></p>
+        <h2 id="retrieval-title" class="block-title">Retrieval design</h2>
+        <div class="prose">
+          <p>
+            DocExtract uses context-enriched hierarchical chunking to improve
+            retrieval over financial PDFs. Each chunk carries global document
+            context, such as fund name, GP, notice date, and document type, and
+            localized context describing the role of that section.
+          </p>
+          <p>The retrieval layer combines four signals:</p>
+        </div>
+        <ul class="retrieval" role="list">
+          {retrieval.map((r) => (
+            <li>{r}</li>
+          ))}
+        </ul>
+        <p class="prose">
+          This avoids relying on vector search alone, which is often weak for
+          exact numbers, proprietary acronyms, and alphanumeric identifiers.
+        </p>
+      </section>
+
+      <!-- Stack -->
+      <section class="block" aria-labelledby="stack-title">
+        <p class="block-num"><span>07</span></p>
+        <h2 id="stack-title" class="block-title">Technical stack</h2>
+        <dl class="stack">
+          {stack.map((s) => (
+            <div class="stack-row">
+              <dt>{s.k}</dt>
+              <dd>{s.v}</dd>
+            </div>
+          ))}
+        </dl>
+      </section>
+
+      <!-- What I learned -->
+      <section class="block" aria-labelledby="learned-title">
+        <p class="block-num"><span>08</span></p>
+        <h2 id="learned-title" class="block-title">What I learned</h2>
+        <div class="prose">
+          <p>
+            The biggest lever was refusing to trust a single prompt. Splitting
+            extraction into a supervisor and three focused workers cost about
+            1.4x more per document but moved accuracy to 91%, which is the
+            tradeoff a financial-operations team will take every time.
+          </p>
+          <p>
+            Deterministic validation turned out to be load-bearing, not a nicety.
+            Schema enforcement, math checks, and reconciliation are what let the
+            output be approved without a human reading every line, and provenance
+            is what makes the approval defensible later. The model is the
+            interpreter; the system is the auditor.
+          </p>
+        </div>
+      </section>
+
+      <footer class="case-foot">
+        <a class="back-link" href="/#studio">
+          <span aria-hidden="true">←</span> Back to projects
+        </a>
+      </footer>
+    </article>
+  </main>
+
+  <footer class="page-footer">
+    <ul class="footer-links" role="list">
+      <li><a href="https://github.com/" rel="me noreferrer">GitHub</a></li>
+      <li><a href="https://www.linkedin.com/in/guru17/" rel="me noreferrer">LinkedIn</a></li>
+      <li><a href="/about">About</a></li>
+      <li><a href="/about#get-in-touch">Contact</a></li>
+    </ul>
+    <p class="footer-meta">Astro · Cloudflare Pages · open source · 2026</p>
+  </footer>
+</BaseLayout>
+
+<style>
+  .skip-link {
+    position: absolute;
+    left: var(--container-edge);
+    top: var(--container-edge);
+    padding: var(--space-snug) var(--space-base);
+    background: var(--surface-raised);
+    color: var(--key-light);
+    border: 1px solid var(--border-key);
+    border-radius: 2px;
+    z-index: 300;
+    transform: translateY(-200%);
+    transition: transform var(--dur-quick) var(--ease-focus-pull);
+  }
+  .skip-link:focus-visible {
+    transform: translateY(0);
+  }
+
+  .site-nav,
+  .case,
+  .page-footer {
+    width: 100%;
+    max-width: var(--container-wide);
+    margin-inline: auto;
+    padding-inline: var(--container-edge);
+  }
+
+  /* Site header — shared recipe. */
+  .site-nav {
+    padding-top: var(--space-roomy);
+    padding-bottom: var(--space-roomy);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-loose);
+    flex-wrap: wrap;
+  }
+  .nav-left {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-base);
+  }
+  .identity {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.55ch;
+    text-decoration: none;
+    color: inherit;
+    font-family: var(--font-mono);
+    text-transform: uppercase;
+    letter-spacing: var(--ls-meta-allcaps);
+  }
+  .identity-name {
+    font-size: var(--fs-small);
+    font-weight: 500;
+    color: var(--ink-strong);
+  }
+  .identity-sep {
+    color: var(--key-light);
+    font-size: var(--fs-small);
+  }
+  .identity-role {
+    font-size: var(--fs-small);
+    color: var(--key-light);
+    font-weight: 500;
+  }
+  .primary-nav {
+    display: flex;
+    gap: var(--space-roomy);
+    flex-wrap: wrap;
+  }
+  .primary-nav a {
+    font-family: var(--font-body);
+    font-size: var(--fs-body);
+    color: var(--ink-strong);
+    text-decoration: none;
+    padding: var(--space-tight) 0;
+    border-bottom: 1px solid transparent;
+    transition:
+      color var(--dur-quick) var(--ease-focus-pull),
+      border-color var(--dur-quick) var(--ease-focus-pull);
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+  }
+  .primary-nav a:hover,
+  .primary-nav a:focus-visible {
+    color: var(--key-light);
+    border-bottom-color: var(--key-light);
+  }
+  .primary-nav a:focus-visible {
+    outline: 2px solid var(--key-light);
+    outline-offset: 4px;
+  }
+
+  .case {
+    padding-top: var(--space-loose);
+    padding-bottom: var(--space-vast);
+  }
+
+  .back-link {
+    font-family: var(--font-mono);
+    font-size: var(--fs-caption);
+    color: var(--ink-muted);
+    text-decoration: none;
+    text-transform: uppercase;
+    letter-spacing: var(--ls-meta-allcaps);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5ch;
+    padding: var(--space-tight) 0;
+    border-bottom: 1px solid transparent;
+    transition:
+      color var(--dur-quick) var(--ease-focus-pull),
+      border-color var(--dur-quick) var(--ease-focus-pull);
+  }
+  .back-link:hover,
+  .back-link:focus-visible {
+    color: var(--key-light);
+    border-bottom-color: var(--key-light);
+  }
+
+  /* Head */
+  .case-head {
+    margin-top: var(--space-spacious);
+    margin-bottom: var(--space-vast);
+    max-width: 60rem;
+  }
+  .case-eyebrow {
+    font-family: var(--font-mono);
+    font-size: var(--fs-caption);
+    color: var(--ink-faint);
+    letter-spacing: var(--ls-meta-allcaps);
+    text-transform: uppercase;
+    margin: 0 0 var(--space-base);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6ch;
+  }
+  .case-status {
+    color: var(--key-light);
+  }
+  .case-sep {
+    color: var(--ink-faint);
+  }
+  .case-title {
+    font-family: var(--font-display);
+    font-size: var(--fs-display);
+    font-weight: 600;
+    line-height: 1.02;
+    letter-spacing: var(--ls-display);
+    color: var(--ink-strong);
+    margin: 0;
+    max-width: 20ch;
+    text-wrap: balance;
+  }
+  .case-pitch {
+    margin: var(--space-loose) 0 0;
+    max-width: 62ch;
+    color: var(--ink);
+    font-family: var(--font-body);
+    font-size: var(--fs-body-lg);
+    line-height: 1.5;
+  }
+  .case-built {
+    margin: var(--space-base) 0 0;
+    max-width: 62ch;
+    color: var(--ink-muted);
+    font-family: var(--font-body);
+    font-size: var(--fs-body);
+    line-height: 1.6;
+  }
+  .case-actions {
+    margin-top: var(--space-loose);
+  }
+
+  .cta--primary {
+    font-family: var(--font-body);
+    font-size: var(--fs-body);
+    font-weight: 500;
+    color: oklch(0.18 0.012 65);
+    background: var(--key-light);
+    text-decoration: none;
+    padding: 0.7rem 1.2rem;
+    border: 1px solid var(--key-light);
+    border-radius: 2px;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    transition:
+      background var(--dur-quick) var(--ease-focus-pull),
+      transform var(--dur-quick) var(--ease-focus-pull);
+  }
+  .cta--primary:hover,
+  .cta--primary:focus-visible {
+    background: var(--key-light-soft);
+    border-color: var(--key-light-soft);
+    transform: translateY(-1px);
+  }
+  .cta--primary:focus-visible {
+    outline: 2px solid var(--ink-strong);
+    outline-offset: 4px;
+  }
+
+  .case-meta {
+    margin: var(--space-spacious) 0 0;
+    padding: var(--space-loose) 0 0;
+    border-top: 1px solid var(--border-hairline);
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+    gap: var(--space-loose) var(--space-roomy);
+  }
+  .case-meta-row {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-hairline);
+  }
+  .case-meta-row dt {
+    font-family: var(--font-mono);
+    font-size: var(--fs-caption);
+    color: var(--ink-faint);
+    text-transform: uppercase;
+    letter-spacing: var(--ls-meta-allcaps);
+  }
+  .case-meta-row dd {
+    margin: 0;
+    font-family: var(--font-body);
+    font-size: var(--fs-body);
+    color: var(--ink);
+  }
+
+  /* Shared section title */
+  .section-title,
+  .block-title {
+    font-family: var(--font-display);
+    font-size: var(--fs-h2);
+    font-weight: 600;
+    line-height: var(--lh-heading);
+    letter-spacing: var(--ls-heading);
+    color: var(--ink-strong);
+    margin: 0 0 var(--space-loose);
+    text-wrap: balance;
+  }
+
+  /* Impact strip */
+  .impact {
+    margin-bottom: var(--space-vast);
+  }
+  .metrics {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+    gap: var(--space-loose) var(--space-roomy);
+  }
+  .metric {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-tight);
+    padding-top: var(--space-base);
+    border-top: 2px solid var(--border-key);
+  }
+  .metric-value {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: var(--fs-h3);
+    font-weight: 600;
+    line-height: 1.1;
+    color: var(--ink-strong);
+  }
+  .metric-label {
+    margin: 0;
+    font-family: var(--font-body);
+    font-size: var(--fs-small);
+    color: var(--ink-muted);
+    line-height: 1.45;
+  }
+  .impact-note {
+    margin: var(--space-loose) 0 0;
+    font-family: var(--font-mono);
+    font-size: var(--fs-caption);
+    color: var(--ink-faint);
+    line-height: 1.5;
+    max-width: 62ch;
+  }
+
+  /* Generic numbered block */
+  .block {
+    margin-bottom: var(--space-vast);
+    scroll-margin-top: 6vh;
+  }
+  .block-num {
+    margin: 0 0 var(--space-snug);
+    font-family: var(--font-mono);
+    color: var(--key-light);
+    font-size: var(--fs-body);
+    font-weight: 500;
+    letter-spacing: var(--ls-caption);
+  }
+
+  .prose,
+  .prose-lede {
+    color: var(--ink);
+    font-family: var(--font-body);
+    max-width: 68ch;
+  }
+  .prose {
+    font-size: var(--fs-body-lg);
+    line-height: var(--lh-body);
+  }
+  .prose p {
+    margin: 0 0 var(--space-base);
+  }
+  .prose p:last-child {
+    margin-bottom: 0;
+  }
+  .prose-lede {
+    margin: 0 0 var(--space-loose);
+    font-size: var(--fs-body-lg);
+    line-height: 1.55;
+    color: var(--ink-muted);
+  }
+
+  .q-list {
+    margin: 0 0 var(--space-base);
+    padding-left: 1.2em;
+    display: grid;
+    gap: var(--space-tight);
+    color: var(--ink);
+  }
+  .q-list li {
+    line-height: 1.5;
+  }
+
+  /* Architecture diagram */
+  .diagram {
+    margin: 0;
+  }
+  .diagram-scroll {
+    overflow-x: auto;
+    border: 1px solid var(--border-hairline);
+    border-radius: 4px;
+    background: var(--surface-sunken);
+    padding: var(--space-base);
+  }
+  .diagram-scroll:focus-visible {
+    outline: 2px solid var(--key-light);
+    outline-offset: 2px;
+  }
+  .diagram-scroll img {
+    display: block;
+    width: 100%;
+    min-width: 720px;
+    height: auto;
+  }
+  .diagram-cap {
+    margin: var(--space-base) 0 0;
+    font-family: var(--font-mono);
+    font-size: var(--fs-caption);
+  }
+  .diagram-cap a {
+    color: var(--key-light);
+    text-decoration: none;
+    border-bottom: 1px solid currentColor;
+    padding-bottom: 1px;
+  }
+  .diagram-cap a:hover,
+  .diagram-cap a:focus-visible {
+    color: var(--ink-strong);
+  }
+
+  /* How it works */
+  .steps {
+    list-style: none;
+    margin: 0 0 var(--space-loose);
+    padding: 0;
+    display: grid;
+    gap: var(--space-loose);
+    max-width: 72ch;
+  }
+  .step {
+    display: grid;
+    grid-template-columns: 3rem minmax(0, 1fr);
+    gap: var(--space-loose);
+    padding-top: var(--space-loose);
+    border-top: 1px solid var(--border-hairline);
+  }
+  .step-num {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: var(--fs-body);
+    color: var(--key-light);
+  }
+  .step-title {
+    font-family: var(--font-display);
+    font-size: var(--fs-subhead);
+    font-weight: 600;
+    line-height: var(--lh-heading);
+    color: var(--ink-strong);
+    margin: 0 0 var(--space-snug);
+  }
+  .step-body p {
+    margin: 0;
+    color: var(--ink);
+    font-family: var(--font-body);
+    font-size: var(--fs-body);
+    line-height: 1.6;
+  }
+
+  .principle {
+    margin: 0;
+    padding-left: var(--space-loose);
+    border-left: 1px solid var(--key-light);
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: var(--fs-h3);
+    line-height: 1.2;
+    color: var(--ink-strong);
+    max-width: 40ch;
+  }
+
+  /* Production-grade — two-column editorial list, NOT boxed cards */
+  .grade {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-loose) var(--space-spacious);
+  }
+  .grade-item {
+    padding-top: var(--space-base);
+    border-top: 1px solid var(--border-hairline);
+  }
+  .grade-title {
+    font-family: var(--font-display);
+    font-size: var(--fs-subhead);
+    font-weight: 600;
+    color: var(--ink-strong);
+    margin: 0 0 var(--space-snug);
+  }
+  .grade-item p {
+    margin: 0;
+    color: var(--ink-muted);
+    font-family: var(--font-body);
+    font-size: var(--fs-body);
+    line-height: 1.6;
+  }
+
+  /* Evidence trail */
+  .evidence {
+    list-style: none;
+    margin: var(--space-loose) 0 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+    gap: var(--space-base) var(--space-roomy);
+    max-width: 72ch;
+  }
+  .evidence-item {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-base);
+    padding-bottom: var(--space-base);
+    border-bottom: 1px solid var(--border-hairline);
+    font-family: var(--font-body);
+    font-size: var(--fs-body);
+    color: var(--ink);
+  }
+  .evidence-num {
+    font-family: var(--font-mono);
+    font-size: var(--fs-caption);
+    color: var(--key-light);
+  }
+
+  /* Retrieval list */
+  .retrieval {
+    list-style: none;
+    margin: 0 0 var(--space-loose);
+    padding: 0;
+    display: grid;
+    gap: var(--space-tight);
+    max-width: 68ch;
+  }
+  .retrieval li {
+    padding-left: 1.4em;
+    position: relative;
+    color: var(--ink);
+    font-family: var(--font-body);
+    font-size: var(--fs-body);
+    line-height: 1.5;
+  }
+  .retrieval li::before {
+    content: '→';
+    position: absolute;
+    left: 0;
+    color: var(--key-light);
+  }
+
+  /* Stack */
+  .stack {
+    margin: 0;
+    display: grid;
+    gap: 0;
+    max-width: 72ch;
+  }
+  .stack-row {
+    display: grid;
+    grid-template-columns: minmax(10rem, 14rem) minmax(0, 1fr);
+    gap: var(--space-loose);
+    padding: var(--space-base) 0;
+    border-top: 1px solid var(--border-hairline);
+  }
+  .stack-row:last-child {
+    border-bottom: 1px solid var(--border-hairline);
+  }
+  .stack-row dt {
+    font-family: var(--font-mono);
+    font-size: var(--fs-caption);
+    color: var(--ink-faint);
+    text-transform: uppercase;
+    letter-spacing: var(--ls-meta-allcaps);
+  }
+  .stack-row dd {
+    margin: 0;
+    font-family: var(--font-body);
+    font-size: var(--fs-body);
+    color: var(--ink);
+    line-height: 1.5;
+  }
+
+  .case-foot {
+    margin-top: var(--space-vast);
+    padding-top: var(--space-loose);
+    border-top: 1px solid var(--border-hairline);
+  }
+
+  /* Page footer */
+  .page-footer {
+    padding-top: var(--space-spacious);
+    padding-bottom: var(--space-roomy);
+    border-top: 1px solid var(--border-hairline);
+    margin-top: var(--space-roomy);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-base);
+    text-align: center;
+  }
+  .footer-line {
+    margin: 0;
+    color: var(--ink-muted);
+    font-size: var(--fs-body);
+  }
+  .footer-links {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--space-loose);
+  }
+  .footer-links a {
+    font-family: var(--font-body);
+    font-size: var(--fs-small);
+    color: var(--ink-muted);
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+    transition:
+      color var(--dur-quick) var(--ease-focus-pull),
+      border-color var(--dur-quick) var(--ease-focus-pull);
+  }
+  .footer-links a:hover,
+  .footer-links a:focus-visible {
+    color: var(--key-light);
+    border-bottom-color: var(--key-light);
+  }
+  .footer-meta {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: var(--fs-caption);
+    color: var(--ink-faint);
+    letter-spacing: 0.02em;
+  }
+
+  @media (max-width: 640px) {
+    /* Sticky header; nav collapses into the dropdown. Back-to-projects (the
+       in-content .back-link) sits just beneath, with the hero close under it. */
+    .site-nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      padding-top: var(--space-base);
+      padding-bottom: var(--space-base);
+      background: var(--bg-stage);
+      border-bottom: 1px solid var(--border-hairline);
+    }
+    .primary-nav {
+      display: none;
+    }
+    .case {
+      padding-top: var(--space-base);
+    }
+    .case-head {
+      margin-top: var(--space-loose);
+    }
+    .grade {
+      grid-template-columns: minmax(0, 1fr);
+      gap: var(--space-loose);
+    }
+    .step {
+      grid-template-columns: minmax(0, 1fr);
+      gap: var(--space-snug);
+    }
+    .stack-row {
+      grid-template-columns: minmax(0, 1fr);
+      gap: var(--space-tight);
+    }
+    .case-meta {
+      grid-template-columns: 1fr;
+      gap: var(--space-base);
+    }
+  }
+</style>

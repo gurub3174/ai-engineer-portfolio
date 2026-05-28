@@ -18,23 +18,22 @@ const FONT_DIR = resolve(__dirname, '..', 'public', 'fonts');
 const FORCE = process.argv.includes('--force');
 const BUDGET_BYTES = 60 * 1024;
 
+// Stable woff2 from the jsDelivr-hosted Fontsource packages (OFL).
 const fonts = [
   {
-    name: 'Source Serif 4 Subhead Semibold',
+    name: 'Source Serif 4 Semibold (latin)',
     file: 'SourceSerif4-Subhead-Semibold.woff2',
-    url: 'https://github.com/adobe-fonts/source-serif/raw/release/WOFF2/subset/SourceSerif4Subhead-Semibold.woff2.subset',
-    fallback:
-      'https://github.com/adobe-fonts/source-serif/raw/release/WOFF2/SourceSerif4Subhead-Semibold.otf.woff2',
+    url: 'https://cdn.jsdelivr.net/npm/@fontsource/source-serif-4@5/files/source-serif-4-latin-600-normal.woff2',
   },
   {
-    name: 'Geist Sans Variable',
+    name: 'Geist Sans Variable (latin)',
     file: 'GeistVariableVF.woff2',
-    url: 'https://github.com/vercel/geist-font/raw/main/packages/next/dist/fonts/geist-sans/Geist-Variable.woff2',
+    url: 'https://cdn.jsdelivr.net/npm/@fontsource-variable/geist@5/files/geist-latin-wght-normal.woff2',
   },
   {
-    name: 'Geist Mono Variable',
+    name: 'Geist Mono Variable (latin)',
     file: 'GeistMonoVariableVF.woff2',
-    url: 'https://github.com/vercel/geist-font/raw/main/packages/next/dist/fonts/geist-mono/GeistMono-Variable.woff2',
+    url: 'https://cdn.jsdelivr.net/npm/@fontsource-variable/geist-mono@5/files/geist-mono-latin-wght-normal.woff2',
   },
 ];
 

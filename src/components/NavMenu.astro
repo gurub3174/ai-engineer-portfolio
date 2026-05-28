@@ -1,0 +1,164 @@
+---
+/*
+ * NavMenu — mobile dropdown navigation (zero-JS).
+ *
+ * A native <details> disclosure: tap "Menu" to open the link panel, tap again
+ * (or anywhere) to close. Keyboard + screen-reader accessible with no script.
+ * Hidden on desktop (>640px) where the page's horizontal .primary-nav shows.
+ *
+ * `current` highlights the active route.
+ */
+type Props = { current?: 'projects' | 'resume' | 'about' | 'contact' };
+const { current } = Astro.props;
+
+const links = [
+  { href: '/#studio', label: 'Projects', key: 'projects' },
+  { href: '/resume', label: 'Resume', key: 'resume' },
+  { href: '/about', label: 'About', key: 'about' },
+  { href: '/about#get-in-touch', label: 'Contact', key: 'contact' },
+];
+
+const social = [{ href: 'https://www.linkedin.com/in/guru17/', label: 'LinkedIn' }];
+---
+
+<details class="nav-menu">
+  <summary class="nav-toggle">
+    <span class="nav-toggle-bars" aria-hidden="true"></span>
+    Menu
+  </summary>
+  <div class="nav-panel">
+    <nav aria-label="Site">
+      {links.map((l) => (
+        <a href={l.href} aria-current={current === l.key ? 'page' : undefined}>{l.label}</a>
+      ))}
+      <span class="nav-panel-rule" aria-hidden="true"></span>
+      {social.map((s) => (
+        <a href={s.href} rel="me noreferrer" target="_blank">{s.label}</a>
+      ))}
+    </nav>
+  </div>
+</details>
+
+<style>
+  /* Desktop hides the dropdown; the page's horizontal nav is shown instead. */
+  .nav-menu {
+    display: none;
+  }
+
+  @media (max-width: 640px) {
+    .nav-menu {
+      display: block;
+      position: relative;
+    }
+
+    .nav-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.55ch;
+      min-height: 44px;
+      padding: var(--space-tight) var(--space-snug);
+      font-family: var(--font-mono);
+      font-size: var(--fs-caption);
+      letter-spacing: var(--ls-meta-allcaps);
+      text-transform: uppercase;
+      color: var(--ink-strong);
+      background: var(--surface-raised);
+      border: 1px solid var(--border-hairline);
+      border-radius: 3px;
+      cursor: pointer;
+      list-style: none;
+      user-select: none;
+    }
+    .nav-toggle::-webkit-details-marker {
+      display: none;
+    }
+    .nav-toggle::marker {
+      content: '';
+    }
+    .nav-toggle:focus-visible {
+      outline: 2px solid var(--key-light);
+      outline-offset: 3px;
+    }
+
+    /* Hamburger glyph drawn from box-shadow bars (no icon font). */
+    .nav-toggle-bars,
+    .nav-toggle-bars::before,
+    .nav-toggle-bars::after {
+      content: '';
+      display: block;
+      width: 16px;
+      height: 2px;
+      background: var(--key-light);
+      border-radius: 1px;
+    }
+    .nav-toggle-bars {
+      position: relative;
+    }
+    .nav-toggle-bars::before {
+      position: absolute;
+      top: -5px;
+    }
+    .nav-toggle-bars::after {
+      position: absolute;
+      top: 5px;
+    }
+
+    .nav-panel {
+      position: absolute;
+      z-index: 50;
+      top: calc(100% + 0.5rem);
+      left: 0;
+      min-width: 12rem;
+      padding: var(--space-snug);
+      background: var(--surface-raised);
+      border: 1px solid var(--border-hairline);
+      border-radius: 4px;
+      box-shadow: 0 18px 40px -24px oklch(0.03 0.004 65 / 0.8);
+    }
+
+    .nav-panel nav {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-hairline);
+    }
+
+    .nav-panel a {
+      display: flex;
+      align-items: center;
+      min-height: 44px;
+      padding: 0 var(--space-snug);
+      font-family: var(--font-body);
+      font-size: var(--fs-body);
+      color: var(--ink);
+      text-decoration: none;
+      border-radius: 2px;
+      transition: color var(--dur-quick) var(--ease-focus-pull),
+        background var(--dur-quick) var(--ease-focus-pull);
+    }
+    .nav-panel a:hover,
+    .nav-panel a:focus-visible {
+      color: var(--key-light);
+      background: var(--surface);
+    }
+    .nav-panel a:focus-visible {
+      outline: 2px solid var(--key-light);
+      outline-offset: -2px;
+    }
+    .nav-panel a[aria-current='page'] {
+      color: var(--key-light);
+    }
+
+    .nav-panel-rule {
+      display: block;
+      height: 1px;
+      margin: var(--space-tight) var(--space-snug);
+      background: var(--border-hairline);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .nav-panel a {
+      transition: none;
+    }
+  }
+</style>

@@ -1,21 +1,16 @@
 ---
-import BaseLayout from '@layouts/BaseLayout.astro';
 import { existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
+import ContactCard from '@components/ContactCard.astro';
+import NavMenu from '@components/NavMenu.astro';
+import BaseLayout from '@layouts/BaseLayout.astro';
 
 /*
- * Resume — dedicated route, not a modal.
+ * Resume — dedicated route. Displays the PDF inline with the same
+ * site-nav + identity as every other page, plus download / open-in-tab
+ * actions and the shared contact card.
  *
- * Rationale: design-system.md bans "modal as first thought."
- * A dedicated route gives us:
- *   - deep-linkable URL (/resume)
- *   - native browser back-button = "x out" (no focus-trap to manage)
- *   - zero hydrated JS (no overlay state machine)
- *   - graceful no-PDF fallback at build time
- *
- * To enable the PDF preview + download, drop the actual resume file at
- * public/resume.pdf. The build below detects its presence at compile time
- * and renders either the embed + download CTA, or a "coming soon" notice.
+ * Drop the file at public/resume.pdf; presence is detected at build time.
  */
 
 const resumeFsPath = fileURLToPath(new URL('../../public/resume.pdf', import.meta.url));
@@ -23,59 +18,72 @@ const hasResume = existsSync(resumeFsPath);
 ---
 
 <BaseLayout
-  title="Resume · AI/data engineer"
-  description="One-page resume for an AI/data engineer with a photographer's eye. Available as a PDF download."
+  title="Resume · Guru Balamurugan"
+  description="One-page resume for Guru Balamurugan, AI/data engineer. View inline or download the PDF."
 >
-  <header class="meta-bar">
-    <p class="stamp">Portfolio · Resume · 2026</p>
+  <a href="#resume" class="skip-link">Skip to the resume</a>
+
+  <header class="site-nav">
+    <div class="nav-left">
+      <a class="identity" href="/" aria-label="Guru Balamurugan, home">
+        <span class="identity-name">Guru Balamurugan</span>
+        <span class="identity-sep" aria-hidden="true">·</span>
+        <span class="identity-role">AI Engineer</span>
+      </a>
+      <NavMenu current="resume" />
+    </div>
+
+    <nav class="primary-nav" aria-label="Primary">
+      <a href="/#studio">Projects</a>
+      <a href="/resume" aria-current="page">Resume</a>
+      <a href="/about">About</a>
+      <a href="/about#get-in-touch">Contact</a>
+    </nav>
+
+    <a class="return-link" href="/#studio">
+      <span aria-hidden="true">←</span> Return to projects
+    </a>
   </header>
 
-  <main class="resume">
+  <main id="resume" class="resume">
     <section class="resume-head" aria-labelledby="resume-title">
       <h1 id="resume-title" class="title">Resume</h1>
-      <p class="subhead">
-        The short version, in one page. The longer version is in the work itself.
-      </p>
 
-      <ul class="cta-row" role="list">
-        {hasResume && (
-          <>
-            <li>
-              <a class="cta cta--primary" href="/resume.pdf" download>
-                Download PDF
-              </a>
-            </li>
-            <li>
-              <a class="cta" href="/resume.pdf" target="_blank" rel="noopener">
-                Open in new tab
-              </a>
-            </li>
-          </>
-        )}
-        <li>
-          <a class="cta cta--quiet" href="/#studio">
-            Back to projects
-          </a>
-        </li>
-      </ul>
+      {hasResume && (
+        <ul class="cta-row" role="list">
+          <li>
+            <a class="cta cta--primary" href="/resume.pdf" download>
+              Download PDF
+            </a>
+          </li>
+          <li>
+            <a class="cta" href="/resume.pdf" target="_blank" rel="noopener">
+              Open in new tab
+            </a>
+          </li>
+        </ul>
+      )}
     </section>
 
     {hasResume ? (
-      <section class="meta-block" aria-label="Resume details">
-        <dl class="resume-meta">
-          <div class="resume-meta-row">
-            <dt>Format</dt>
-            <dd>PDF, one page</dd>
-          </div>
-          <div class="resume-meta-row">
-            <dt>Updated</dt>
-            <dd><time datetime="2026-05">May 2026</time></dd>
-          </div>
-          <div class="resume-meta-row">
-            <dt>Preview</dt>
-            <dd>Hosted on Cloudflare Pages. Open in a new tab to read inline; the download button serves the same file.</dd>
-          </div>
-        </dl>
+      <section class="resume-preview" aria-label="Resume preview">
+        <div class="resume-frame-wrap">
+          <iframe
+            class="resume-frame"
+            src="/resume.pdf#view=FitH&toolbar=0"
+            title="Resume: Guru Balamurugan"
+            loading="lazy"
+          ></iframe>
+          {/* Mobile-only: the inline frame is too small to read, so the whole
+              preview becomes a tap target that opens the full PDF. */}
+          <a class="resume-open" href="/resume.pdf" target="_blank" rel="noopener">
+            <span>Open full resume</span>
+          </a>
+        </div>
+        <p class="resume-fallback">
+          Can't see the resume above?{' '}
+          <a href="/resume.pdf" target="_blank" rel="noopener">Open the PDF in a new tab.</a>
+        </p>
       </section>
     ) : (
       <section class="placeholder" aria-label="Resume placeholder">
@@ -84,27 +92,48 @@ const hasResume = existsSync(resumeFsPath);
           under each project are the better read anyway.
         </p>
         <p class="placeholder-meta">
-          Drop a file at <code>public/resume.pdf</code> to enable the download
-          and inline preview on this page.
+          Drop a file at <code>public/resume.pdf</code> to enable the inline
+          view and download on this page.
         </p>
       </section>
     )}
+
+    <div class="resume-contact">
+      <ContactCard />
+    </div>
   </main>
 
   <footer class="page-footer">
     <ul class="footer-links" role="list">
       <li><a href="/">Home</a></li>
       <li><a href="/about">About</a></li>
-      <li><a href="/contact">Contact</a></li>
+      <li><a href="/about#get-in-touch">Contact</a></li>
       <li><a href="https://github.com/" rel="me noreferrer">GitHub</a></li>
-      <li><a href="https://www.linkedin.com/" rel="me noreferrer">LinkedIn</a></li>
+      <li><a href="https://www.linkedin.com/in/guru17/" rel="me noreferrer">LinkedIn</a></li>
     </ul>
     <p class="footer-meta">Astro · Cloudflare Pages · open source · 2026</p>
   </footer>
 </BaseLayout>
 
 <style>
-  .meta-bar,
+  .skip-link {
+    position: absolute;
+    left: var(--container-edge);
+    top: var(--container-edge);
+    padding: var(--space-snug) var(--space-base);
+    background: var(--surface-raised);
+    color: var(--key-light);
+    border: 1px solid var(--border-key);
+    border-radius: 2px;
+    z-index: 300;
+    transform: translateY(-200%);
+    transition: transform var(--dur-quick) var(--ease-focus-pull);
+  }
+  .skip-link:focus-visible {
+    transform: translateY(0);
+  }
+
+  .site-nav,
   .resume,
   .page-footer {
     width: 100%;
@@ -113,27 +142,109 @@ const hasResume = existsSync(resumeFsPath);
     padding-inline: var(--container-edge);
   }
 
-  .meta-bar {
+  /* Site header — identical recipe to the case-study + about pages. */
+  .site-nav {
     padding-top: var(--space-roomy);
-    padding-bottom: var(--space-base);
+    padding-bottom: var(--space-roomy);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-loose);
+    flex-wrap: wrap;
   }
 
-  .stamp {
+  .nav-left {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-base);
+  }
+
+  /* Mobile-only return link (replaces the horizontal nav on small screens). */
+  .return-link {
+    display: none;
     font-family: var(--font-mono);
     font-size: var(--fs-caption);
-    color: var(--ink-faint);
     letter-spacing: var(--ls-meta-allcaps);
     text-transform: uppercase;
-    margin: 0;
+    color: var(--ink-muted);
+    text-decoration: none;
+    align-items: center;
+    gap: 0.5ch;
+    min-height: 44px;
+  }
+  .return-link:hover,
+  .return-link:focus-visible {
+    color: var(--key-light);
+  }
+
+  .identity {
+    display: inline-flex;
+    align-items: baseline;
+    gap: var(--space-snug);
+    color: var(--ink-strong);
+    text-decoration: none;
+    font-family: var(--font-mono);
+    font-size: var(--fs-caption);
+    letter-spacing: var(--ls-meta-allcaps);
+    text-transform: uppercase;
+    min-height: 44px;
+  }
+
+  .identity-sep {
+    color: var(--key-light);
+  }
+
+  .identity-role {
+    color: var(--ink-muted);
+  }
+
+  .primary-nav {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-loose);
+    flex-wrap: wrap;
+  }
+
+  .primary-nav a {
+    font-family: var(--font-mono);
+    font-size: var(--fs-caption);
+    color: var(--ink-muted);
+    letter-spacing: var(--ls-meta-allcaps);
+    text-transform: uppercase;
+    text-decoration: none;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    border-bottom: 1px solid transparent;
+    transition:
+      color var(--dur-quick) var(--ease-focus-pull),
+      border-color var(--dur-quick) var(--ease-focus-pull);
+  }
+
+  .primary-nav a:hover,
+  .primary-nav a:focus-visible {
+    color: var(--ink-strong);
+    border-bottom-color: var(--key-light);
+  }
+
+  .primary-nav a[aria-current='page'] {
+    color: var(--ink-strong);
+    border-bottom-color: var(--key-light);
   }
 
   .resume {
     padding-top: var(--space-spacious);
     padding-bottom: var(--space-roomy);
+    display: grid;
+    gap: var(--space-spacious);
   }
 
   .resume-head {
-    margin-bottom: var(--space-loose);
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-loose);
   }
 
   .title {
@@ -146,22 +257,14 @@ const hasResume = existsSync(resumeFsPath);
     margin: 0;
   }
 
-  .subhead {
-    margin: var(--space-base) 0 0;
-    max-width: 60ch;
-    color: var(--ink-muted);
-    font-family: var(--font-body);
-    font-size: var(--fs-body-lg);
-    line-height: 1.55;
-  }
-
   .cta-row {
     list-style: none;
-    margin: var(--space-loose) 0 0;
+    margin: 0;
     padding: 0;
     display: flex;
     gap: var(--space-loose);
     flex-wrap: wrap;
+    align-items: center;
   }
 
   .cta {
@@ -180,23 +283,10 @@ const hasResume = existsSync(resumeFsPath);
     align-items: center;
   }
 
-  .cta::after {
-    content: ' →';
-    white-space: nowrap;
-    margin-left: 0.2ch;
-    transition: transform var(--dur-quick) var(--ease-focus-pull);
-    display: inline-block;
-  }
-
   .cta:hover,
   .cta:focus-visible {
     color: var(--ink-strong);
     border-color: var(--ink-strong);
-  }
-
-  .cta:hover::after,
-  .cta:focus-visible::after {
-    transform: translateX(3px);
   }
 
   .cta:focus-visible {
@@ -205,43 +295,65 @@ const hasResume = existsSync(resumeFsPath);
     border-color: transparent;
   }
 
-  .cta--quiet {
-    color: var(--ink-muted);
+  /* Primary CTA — solid warm-tungsten button (matches home hero). */
+  .cta--primary {
+    color: oklch(0.18 0.012 65);
+    background: var(--key-light);
+    padding: 0.7rem 1.2rem;
+    border: 1px solid var(--key-light);
+    border-radius: 2px;
   }
 
-  .meta-block {
-    border-top: 1px solid var(--border-hairline);
-    padding-top: var(--space-loose);
-    max-width: 60ch;
+  .cta--primary:hover,
+  .cta--primary:focus-visible {
+    background: var(--key-light-soft);
+    border-color: var(--key-light-soft);
+    color: oklch(0.18 0.012 65);
   }
 
-  .resume-meta {
-    margin: 0;
+  .cta--primary:focus-visible {
+    outline: 2px solid var(--ink-strong);
+    outline-offset: 4px;
+  }
+
+  /* Inline PDF view. Portrait one-page ratio; scrolls internally if longer. */
+  .resume-preview {
     display: grid;
     gap: var(--space-base);
   }
 
-  .resume-meta-row {
-    display: grid;
-    grid-template-columns: 9ch minmax(0, 1fr);
-    column-gap: var(--space-base);
-    align-items: baseline;
+  .resume-frame-wrap {
+    position: relative;
+    width: 100%;
+    max-width: 760px;
+    margin-inline: auto;
   }
 
-  .resume-meta-row dt {
+  .resume-frame {
+    width: 100%;
+    aspect-ratio: 8.5 / 11;
+    border: 1px solid var(--border-hairline);
+    border-radius: 3px;
+    background: var(--surface-raised);
+    display: block;
+  }
+
+  /* Tap-to-open overlay: desktop hides it (the frame is readable/interactive);
+     mobile shows it because the inline frame is too small to read. */
+  .resume-open {
+    display: none;
+  }
+
+  .resume-fallback {
+    margin: 0;
+    text-align: center;
+    color: var(--ink-faint);
     font-family: var(--font-mono);
     font-size: var(--fs-caption);
-    color: var(--ink-faint);
-    letter-spacing: var(--ls-meta-allcaps);
-    text-transform: uppercase;
   }
 
-  .resume-meta-row dd {
-    margin: 0;
-    color: var(--ink);
-    font-family: var(--font-body);
-    font-size: var(--fs-body);
-    line-height: 1.55;
+  .resume-fallback a {
+    color: var(--key-light);
   }
 
   .placeholder {
@@ -253,11 +365,10 @@ const hasResume = existsSync(resumeFsPath);
   }
 
   .placeholder-text {
-    margin: 0;
+    margin: 0 auto;
     color: var(--ink);
     font-size: var(--fs-body-lg);
     max-width: 50ch;
-    margin-inline: auto;
     line-height: 1.5;
   }
 
@@ -309,6 +420,86 @@ const hasResume = existsSync(resumeFsPath);
   }
 
   @media (max-width: 640px) {
+    /* Sticky header; horizontal nav collapses into the dropdown + return link. */
+    .site-nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      padding-top: var(--space-base);
+      padding-bottom: var(--space-base);
+      background: var(--bg-stage);
+      border-bottom: 1px solid var(--border-hairline);
+    }
+    .primary-nav {
+      display: none;
+    }
+    .return-link {
+      display: inline-flex;
+    }
+
+    /* Tighten the gap between the identity bar and the Resume title. */
+    .resume {
+      padding-top: var(--space-loose);
+      gap: var(--space-loose);
+    }
+
+    /* Title stacks above full-width actions. */
+    .resume-head {
+      flex-direction: column;
+      align-items: stretch;
+      gap: var(--space-loose);
+    }
+    .cta-row {
+      gap: var(--space-base);
+    }
+    .cta {
+      flex: 1 1 auto;
+      justify-content: center;
+    }
+
+    /* Inline frame becomes a non-interactive preview; the overlay opens the
+       full PDF since the inline text is unreadable at phone size. */
+    .resume-frame {
+      pointer-events: none;
+      aspect-ratio: 3 / 4;
+    }
+    .resume-open {
+      display: flex;
+      position: absolute;
+      inset: 0;
+      align-items: flex-end;
+      justify-content: center;
+      padding: var(--space-loose);
+      border-radius: 3px;
+      text-decoration: none;
+      background: linear-gradient(
+        to top,
+        oklch(0.05 0.005 65 / 0.82) 0%,
+        oklch(0.05 0.005 65 / 0.12) 38%,
+        transparent 70%
+      );
+    }
+    .resume-open span {
+      font-family: var(--font-body);
+      font-size: var(--fs-body);
+      font-weight: 500;
+      color: oklch(0.18 0.012 65);
+      background: var(--key-light);
+      padding: 0.7rem 1.2rem;
+      border-radius: 2px;
+      min-height: 44px;
+      display: inline-flex;
+      align-items: center;
+    }
+    .resume-open span::after {
+      content: ' →';
+      margin-left: 0.3ch;
+    }
+    .resume-open:focus-visible {
+      outline: 2px solid var(--key-light);
+      outline-offset: 3px;
+    }
+
     .footer-links {
       gap: var(--space-base);
     }

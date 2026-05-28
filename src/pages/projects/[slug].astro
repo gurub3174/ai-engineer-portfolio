@@ -1,5 +1,6 @@
 ---
-import { getCollection, type CollectionEntry } from 'astro:content';
+import { type CollectionEntry, getCollection } from 'astro:content';
+import NavMenu from '@components/NavMenu.astro';
 import BaseLayout from '@layouts/BaseLayout.astro';
 
 /*
@@ -41,17 +42,20 @@ const sections = [
   <a href="#case" class="skip-link">Skip to the case study</a>
 
   <header class="site-nav">
-    <a class="identity" href="/" aria-label="Guru Balamurugan, home">
-      <span class="identity-name">Guru Balamurugan</span>
-      <span class="identity-sep" aria-hidden="true">·</span>
-      <span class="identity-role">AI Engineer</span>
-    </a>
+    <div class="nav-left">
+      <a class="identity" href="/" aria-label="Guru Balamurugan, home">
+        <span class="identity-name">Guru Balamurugan</span>
+        <span class="identity-sep" aria-hidden="true">·</span>
+        <span class="identity-role">AI Engineer</span>
+      </a>
+      <NavMenu current="projects" />
+    </div>
 
     <nav class="primary-nav" aria-label="Primary">
       <a href="/#studio">Projects</a>
       <a href="/resume">Resume</a>
       <a href="/about">About</a>
-      <a href="/contact">Contact</a>
+      <a href="/about#get-in-touch">Contact</a>
     </nav>
   </header>
 
@@ -198,12 +202,11 @@ const sections = [
   </main>
 
   <footer class="page-footer">
-    <p class="footer-line">The work, lit and labeled.</p>
     <ul class="footer-links" role="list">
       <li><a href="https://github.com/" rel="me noreferrer">GitHub</a></li>
-      <li><a href="https://www.linkedin.com/" rel="me noreferrer">LinkedIn</a></li>
+      <li><a href="https://www.linkedin.com/in/guru17/" rel="me noreferrer">LinkedIn</a></li>
       <li><a href="/about">About</a></li>
-      <li><a href="/contact">Contact</a></li>
+      <li><a href="/about#get-in-touch">Contact</a></li>
     </ul>
     <p class="footer-meta">Astro · Cloudflare Pages · open source · 2026</p>
   </footer>
@@ -253,6 +256,12 @@ const sections = [
     justify-content: space-between;
     gap: var(--space-loose);
     flex-wrap: wrap;
+  }
+
+  .nav-left {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-base);
   }
 
   .identity {
@@ -729,6 +738,26 @@ const sections = [
    * Responsive
    * ============================================================ */
   @media (max-width: 640px) {
+    /* Sticky header; nav collapses into the dropdown. Back-to-projects sits
+       just beneath, hero close under it. */
+    .site-nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      padding-top: var(--space-base);
+      padding-bottom: var(--space-base);
+      background: var(--bg-stage);
+      border-bottom: 1px solid var(--border-hairline);
+    }
+    .primary-nav {
+      display: none;
+    }
+    .case-study {
+      padding-top: var(--space-base);
+    }
+    .case-head {
+      margin-top: var(--space-loose);
+    }
     .case-meta {
       grid-template-columns: 1fr;
       gap: var(--space-base);

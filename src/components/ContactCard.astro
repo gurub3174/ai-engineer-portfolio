@@ -1,0 +1,93 @@
+---
+/*
+ * Contact card — shared by /about and /resume.
+ *
+ * A flat specimen card (no nesting, hairline border, role tokens) listing
+ * the two ways to reach Guru. tel:/mailto: links keep it actionable on
+ * mobile and accessible to keyboard + screen readers.
+ */
+---
+
+<section class="contact" id="get-in-touch" aria-labelledby="contact-title">
+  <h2 id="contact-title" class="contact-title">Want to talk?</h2>
+
+  <div class="contact-card">
+    <a class="contact-row" href="tel:+12033901130">
+      <span class="contact-label">Phone</span>
+      <span class="contact-value">203-390-1130</span>
+    </a>
+    <a class="contact-row" href="mailto:gurub.3174@gmail.com">
+      <span class="contact-label">Email</span>
+      <span class="contact-value">gurub.3174@gmail.com</span>
+    </a>
+  </div>
+</section>
+
+<style>
+  .contact {
+    max-width: 60ch;
+  }
+
+  .contact-title {
+    font-family: var(--font-display);
+    font-size: var(--fs-h2);
+    font-weight: 600;
+    line-height: var(--lh-heading);
+    letter-spacing: var(--ls-display);
+    color: var(--ink-strong);
+    margin: 0 0 var(--space-loose);
+  }
+
+  .contact-card {
+    display: grid;
+    border: 1px solid var(--border-hairline);
+    border-radius: 3px;
+    background: var(--surface-raised);
+    overflow: hidden;
+  }
+
+  .contact-row {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-loose);
+    padding: var(--space-loose);
+    text-decoration: none;
+    color: inherit;
+    min-height: 44px;
+    transition: background var(--dur-quick) var(--ease-focus-pull);
+  }
+
+  .contact-row + .contact-row {
+    border-top: 1px solid var(--border-hairline);
+  }
+
+  .contact-row:hover,
+  .contact-row:focus-visible {
+    background: var(--surface);
+  }
+
+  .contact-row:focus-visible {
+    outline: 2px solid var(--key-light);
+    outline-offset: -2px;
+  }
+
+  .contact-label {
+    font-family: var(--font-mono);
+    font-size: var(--fs-caption);
+    color: var(--ink-faint);
+    letter-spacing: var(--ls-meta-allcaps);
+    text-transform: uppercase;
+    min-width: 6ch;
+  }
+
+  .contact-value {
+    font-family: var(--font-body);
+    font-size: var(--fs-body-lg);
+    color: var(--ink-strong);
+  }
+
+  .contact-row:hover .contact-value,
+  .contact-row:focus-visible .contact-value {
+    color: var(--key-light);
+  }
+</style>
