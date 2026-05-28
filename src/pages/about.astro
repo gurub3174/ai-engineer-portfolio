@@ -74,11 +74,29 @@ const decoder = [
         <h1 id="about-title" class="about-title">
           Photographer's eye, engineer's discipline.
         </h1>
-        <p class="about-pitch">
-          The site is shot like a studio because that is how I think about
-          systems. Light the subject, hide the rig, label every decision
-          someone else might have to re-read at 2am.
-        </p>
+        <div class="about-bio">
+          <p>
+            NYC based. AI Engineer Monday to Friday, photographer on
+            weekends. I started as a data engineer, building Python
+            pipelines, Snowflake models, and dbt transformations that
+            turned messy, sparse data into clean client-ready marts. That
+            work made me allergic to AI fluff. I like a good demo as much
+            as anyone, but I care more about what happens when the system
+            fails. We treat data pipelines that way, so why should AI
+            pipelines be any different? It is why I built a document
+            extractor as a deterministic, governed tool, not a prototype
+            that looks great until it meets a real document.
+          </p>
+          <p>
+            Now I am building an AI design team around the same belief: a
+            model is only as good as its input. Every project at work has
+            a PM and documentation, and models deserve the same. Specs,
+            artifacts, constraints, and asking "why" are what make vibe
+            coding actually hold up. My spicy take: AI will replace us, so
+            do not be the one getting dumber with every prompt. Think while
+            you build.
+          </p>
+        </div>
       </header>
 
       <figure class="portrait">
@@ -264,11 +282,23 @@ const decoder = [
     max-width: 22ch;
   }
 
-  .about-pitch {
+  .about-bio {
     margin: var(--space-loose) 0 0;
-    max-width: 60ch;
+    max-width: 62ch;
+    display: grid;
+    gap: var(--space-base);
+  }
+
+  .about-bio p {
+    margin: 0;
     color: var(--ink-muted);
     font-family: var(--font-body);
+    font-size: var(--fs-body);
+    line-height: 1.65;
+  }
+
+  .about-bio p:first-child {
+    color: var(--ink);
     font-size: var(--fs-body-lg);
     line-height: 1.55;
   }
